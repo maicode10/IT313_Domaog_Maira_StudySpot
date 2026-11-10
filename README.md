@@ -1,1 +1,1 @@
-# -IT313_Domaog_Maira_StudySpot
+# IT313_Domaog_Maira_StudySpot
