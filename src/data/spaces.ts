@@ -1,0 +1,61 @@
+import { StudySpace } from "../types";
+
+// ---------------------------------------------------------------------------
+// Starter data. Occupancy % and its colour are COMPUTED (see utils/occupancy),
+// never hard-coded here.
+// ---------------------------------------------------------------------------
+
+export const spaces: StudySpace[] = [
+  {
+    id: "s1",
+    name: "Library Quiet Room 2A",
+    building: "Main Library",
+    floor: "2nd floor",
+    type: "Quiet",
+    seats: 12,
+    occupied: 4,
+    amenities: ["Wi-Fi", "Outlets", "Whiteboard"],
+    description: "A quiet room for individual or small-group study.",
+    slots: ["9:00-10:00", "10:00-11:00", "1:00-2:00", "3:00-4:00", "5:00-6:00"],
+    bookedSlots: ["9:00-10:00"],
+  },
+  {
+    id: "s2",
+    name: "Group Study Pod B",
+    building: "Main Library",
+    floor: "1st floor",
+    type: "Group",
+    seats: 8,
+    occupied: 6,
+    amenities: ["Wi-Fi", "Monitor"],
+    description: "A glass pod for group discussions.",
+    slots: ["10:00-11:00", "1:00-2:00", "3:00-4:00"],
+    bookedSlots: [],
+  },
+  {
+    id: "s3",
+    name: "ICT Collab Lab",
+    building: "ICT Building",
+    floor: "Room 204",
+    type: "Group",
+    seats: 20,
+    occupied: 11,
+    amenities: ["Wi-Fi", "Outlets", "Projector"],
+    description: "Open lab space for team projects.",
+    slots: ["9:00-10:00", "1:00-2:00", "3:00-4:00"],
+    bookedSlots: ["1:00-2:00"],
+  },
+  {
+    id: "s4",
+    name: "Innovation Hub Nook",
+    building: "ICT Building",
+    floor: "Ground floor",
+    type: "Group",
+    seats: 10,
+    occupied: 9,
+    amenities: ["Wi-Fi"],
+    description: "A small corner for quick team meetings.",
+    slots: ["10:00-11:00", "3:00-4:00"],
+    bookedSlots: [],
+  },
+];
