@@ -12,6 +12,8 @@ export type StudySpace = {
   description: string;
   slots: string[];
   bookedSlots: string[];
+  /** optional photo; the details screen falls back to a placeholder */
+  imageUrl?: string;
 };
 
 export type Booking = {
@@ -31,6 +33,7 @@ export type User = {
 };
 
 export type FilterKey = "All" | "Quiet" | "Group" | "Open now";
+
 /** The chips shown on Explore, in display order (F5). */
 export const FILTERS: FilterKey[] = ["All", "Quiet", "Group", "Open now"];
 

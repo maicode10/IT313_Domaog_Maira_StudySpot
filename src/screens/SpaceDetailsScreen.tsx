@@ -9,6 +9,7 @@ import OccupancyRing from "../components/OccupancyRing";
 import PrimaryButton from "../components/PrimaryButton";
 import ScreenHero from "../components/ScreenHero";
 import SlotChip from "../components/SlotChip";
+import SpaceImage from "../components/SpaceImage";
 import { colors, font, radius, sheet, shadow, spacing } from "../theme/theme";
 import { StudySpace } from "../types";
 import { freeSlots, occupancyLabel, occupancyPercent, seatsLeft } from "../utils/occupancy";
@@ -87,11 +88,7 @@ export default function SpaceDetailsScreen({
 
       <View style={sheet}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          {/* image placeholder - a real photo would go here */}
-          <View style={styles.photo}>
-            <Ionicons name="image-outline" size={30} color={colors.violetMid} />
-            <Text style={styles.photoText}>Photo coming soon</Text>
-          </View>
+          <SpaceImage uri={space.imageUrl} label={space.name} />
 
           <View style={styles.chipRow}>
             <Chip label={space.type} />
@@ -118,7 +115,7 @@ export default function SpaceDetailsScreen({
 
             <View style={styles.slotRow}>
               {space.slots.map((slot) => (
-                                <SlotChip
+                <SlotChip
                   key={slot}
                   label={slot}
                   disabled={space.bookedSlots.includes(slot)}
@@ -174,21 +171,6 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     paddingBottom: spacing.xl,
     gap: spacing.lg,
-  },
-  photo: {
-    height: 140,
-    borderRadius: radius.xl,
-    backgroundColor: colors.violetSoft,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.xs,
-  },
-  photoText: {
-    fontSize: font.tiny,
-    fontWeight: "700",
-    color: colors.violetDark,
   },
   chipRow: {
     flexDirection: "row",

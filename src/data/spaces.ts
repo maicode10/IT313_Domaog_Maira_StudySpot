@@ -8,6 +8,7 @@ import { StudySpace } from "../types";
 export const spaces: StudySpace[] = [
   {
     id: "s1",
+    imageUrl: "https://picsum.photos/seed/studyspot-library-2a/800/400",
     name: "Library Quiet Room 2A",
     building: "Main Library",
     floor: "2nd floor",
@@ -21,6 +22,7 @@ export const spaces: StudySpace[] = [
   },
   {
     id: "s2",
+    imageUrl: "https://picsum.photos/seed/studyspot-pod-b/800/400",
     name: "Group Study Pod B",
     building: "Main Library",
     floor: "1st floor",
@@ -34,6 +36,7 @@ export const spaces: StudySpace[] = [
   },
   {
     id: "s3",
+    imageUrl: "https://picsum.photos/seed/studyspot-collab-lab/800/400",
     name: "ICT Collab Lab",
     building: "ICT Building",
     floor: "Room 204",
@@ -47,6 +50,7 @@ export const spaces: StudySpace[] = [
   },
   {
     id: "s4",
+    imageUrl: "https://picsum.photos/seed/studyspot-hub-nook/800/400",
     name: "Innovation Hub Nook",
     building: "ICT Building",
     floor: "Ground floor",
