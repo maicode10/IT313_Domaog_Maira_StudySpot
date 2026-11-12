@@ -27,8 +27,8 @@ const navTheme = {
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [spaces] = useState<StudySpace[]>(initialSpaces);
-  const [bookings] = useState<Booking[]>([]);
+  const [spaces, setSpaces] = useState<StudySpace[]>(initialSpaces);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [remindersOn, setRemindersOn] = useState(true);
 
@@ -38,7 +38,9 @@ export default function App() {
 
   const handleSignOut = useCallback(() => {
     setUser(null);
+    setBookings([]);
     setFavorites([]);
+    setSpaces(initialSpaces);
   }, []);
 
   const handleToggleFavorite = useCallback((spaceId: string) => {
@@ -47,6 +49,41 @@ export default function App() {
         ? current.filter((id) => id !== spaceId)
         : [...current, spaceId]
     );
+  }, []);
+
+  const handleConfirmBooking = useCallback((booking: Booking) => {
+    setBookings((current) => [booking, ...current]);
+
+    // the slot is taken now, so mark it on the space as well
+    setSpaces((current) =>
+      current.map((space) =>
+        space.id === booking.spaceId
+          ? { ...space, bookedSlots: [...space.bookedSlots, booking.slot] }
+          : space
+      )
+    );
+  }, []);
+
+  const handleCancelBooking = useCallback((bookingId: string) => {
+    setBookings((current) => {
+      const target = current.find((b) => b.id === bookingId);
+
+      if (target) {
+        // free the slot again
+        setSpaces((all) =>
+          all.map((space) =>
+            space.id === target.spaceId
+              ? {
+                  ...space,
+                  bookedSlots: space.bookedSlots.filter((s) => s !== target.slot),
+                }
+              : space
+          )
+        );
+      }
+
+      return current.filter((b) => b.id !== bookingId);
+    });
   }, []);
 
   return (
@@ -61,6 +98,8 @@ export default function App() {
           onSignIn={handleSignIn}
           onSignOut={handleSignOut}
           onToggleFavorite={handleToggleFavorite}
+          onConfirmBooking={handleConfirmBooking}
+          onCancelBooking={handleCancelBooking}
           remindersOn={remindersOn}
           onToggleReminders={setRemindersOn}
         />

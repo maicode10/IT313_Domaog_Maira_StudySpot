@@ -19,6 +19,7 @@ type Props = {
   bookings: Booking[];
   favorites: string[];
   onToggleFavorite: (spaceId: string) => void;
+  onCancelBooking: (bookingId: string) => void;
   onSignOut: () => void;
   remindersOn: boolean;
   onToggleReminders: (value: boolean) => void;
@@ -34,6 +35,7 @@ export default function MainTabs({
   bookings,
   favorites,
   onToggleFavorite,
+  onCancelBooking,
   onSignOut,
   remindersOn,
   onToggleReminders,
@@ -48,7 +50,7 @@ export default function MainTabs({
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          height: Platform.OS === "ios" ? 86 : 64,
+          height: Platform.OS === "ios" ? 86 : 66,
           paddingTop: 8,
           paddingBottom: Platform.OS === "ios" ? 28 : 10,
         },
@@ -92,7 +94,13 @@ export default function MainTabs({
           ),
         }}
       >
-        {(props) => <MyBookingsScreen {...props} bookings={bookings} />}
+        {(props) => (
+          <MyBookingsScreen
+            {...props}
+            bookings={bookings}
+            onCancelBooking={onCancelBooking}
+          />
+        )}
       </Tab.Screen>
 
       <Tab.Screen
