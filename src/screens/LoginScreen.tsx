@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import HeroGlow from "../components/HeroGlow";
 import PrimaryButton from "../components/PrimaryButton";
 import { colors, font, radius, shadow, spacing } from "../theme/theme";
 import { RootStackScreenProps } from "../navigation/types";
@@ -44,12 +45,7 @@ export default function LoginScreen({ onSignIn }: Props) {
 
   return (
     <View style={styles.root}>
-      {/* glow sits behind everything on this screen */}
-      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-        <View style={[styles.blob, styles.blobA]} />
-        <View style={[styles.blob, styles.blobB]} />
-        <View style={[styles.blob, styles.blobC]} />
-      </View>
+      <HeroGlow variant="screen" />
 
       <SafeAreaView style={styles.flex} edges={["top", "bottom"]}>
         <KeyboardAvoidingView
@@ -114,28 +110,6 @@ export default function LoginScreen({ onSignIn }: Props) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.navy, overflow: "hidden" },
   flex: { flex: 1 },
-  blob: { position: "absolute", borderRadius: radius.pill },
-  blobA: {
-    width: 320,
-    height: 320,
-    top: -130,
-    right: -110,
-    backgroundColor: colors.heroGlowA,
-  },
-  blobB: {
-    width: 260,
-    height: 260,
-    top: 120,
-    left: -130,
-    backgroundColor: colors.heroGlowB,
-  },
-  blobC: {
-    width: 140,
-    height: 140,
-    top: 40,
-    left: 120,
-    backgroundColor: colors.heroGlowC,
-  },
   scroll: {
     flexGrow: 1,
     justifyContent: "center",
