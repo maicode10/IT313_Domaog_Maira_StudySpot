@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Pressable } from "react-native";
 
-import { colors, headerTheme } from "../theme/theme";
+import { colors, headerTheme, Palette } from "../theme/theme";
 import { Booking, StudySpace, User } from "../types";
 import { RootStackParamList } from "./types";
 
@@ -20,14 +20,19 @@ type Props = {
   spaces: StudySpace[];
   bookings: Booking[];
   favorites: string[];
+  palette: Palette;
+  remindersOn: boolean;
+  darkMode: boolean;
+  liveOccupancy: boolean;
   onSignIn: (name: string, section: string) => void;
   onSignOut: () => void;
+  onSaveProfile: (name: string, section: string) => void;
   onToggleFavorite: (spaceId: string) => void;
   onConfirmBooking: (booking: Booking) => void;
-  onSaveProfile: (name: string, section: string) => void;
   onCancelBooking: (bookingId: string) => void;
-  remindersOn: boolean;
   onToggleReminders: (value: boolean) => void;
+  onToggleDarkMode: (value: boolean) => void;
+  onToggleLiveOccupancy: (value: boolean) => void;
 };
 
 /**
@@ -35,29 +40,36 @@ type Props = {
  * Signed out -> only Login is registered.
  * Signed in  -> Main (tabs) + SpaceDetails + Booking + EditProfile (modals).
  * We never navigate by hand between the two halves; changing `user` does it.
- *
- * The stack header is navy and so is the top of every screen, so the header
- * and the hero read as one block instead of two stacked bars.
  */
 export default function RootNavigator({
   user,
   spaces,
   bookings,
   favorites,
+  palette,
+  remindersOn,
+  darkMode,
+  liveOccupancy,
   onSignIn,
   onSignOut,
+  onSaveProfile,
   onToggleFavorite,
   onConfirmBooking,
   onCancelBooking,
-  onSaveProfile,
-  remindersOn,
   onToggleReminders,
+  onToggleDarkMode,
+  onToggleLiveOccupancy,
 }: Props) {
   return (
-    <Stack.Navigator screenOptions={headerTheme}>
+    <Stack.Navigator
+      screenOptions={{
+        ...headerTheme,
+        contentStyle: { backgroundColor: palette.bg },
+      }}
+    >
       {user === null ? (
         <Stack.Screen name="Login" options={{ headerShown: false }}>
-          {(props) => <LoginScreen {...props} onSignIn={onSignIn} />}
+          {(props) => <LoginScreen {...props} palette={palette} onSignIn={onSignIn} />}
         </Stack.Screen>
       ) : (
         <>
@@ -68,11 +80,16 @@ export default function RootNavigator({
                 spaces={spaces}
                 bookings={bookings}
                 favorites={favorites}
+                palette={palette}
+                remindersOn={remindersOn}
+                darkMode={darkMode}
+                liveOccupancy={liveOccupancy}
                 onToggleFavorite={onToggleFavorite}
                 onCancelBooking={onCancelBooking}
-                onSignOut={onSignOut}
-                remindersOn={remindersOn}
                 onToggleReminders={onToggleReminders}
+                onToggleDarkMode={onToggleDarkMode}
+                onToggleLiveOccupancy={onToggleLiveOccupancy}
+                onSignOut={onSignOut}
               />
             )}
           </Stack.Screen>
@@ -83,6 +100,7 @@ export default function RootNavigator({
                 {...props}
                 spaces={spaces}
                 favorites={favorites}
+                palette={palette}
                 onToggleFavorite={onToggleFavorite}
               />
             )}
@@ -105,6 +123,7 @@ export default function RootNavigator({
                 {...props}
                 spaces={spaces}
                 bookings={bookings}
+                palette={palette}
                 onConfirmBooking={onConfirmBooking}
               />
             )}
@@ -126,6 +145,7 @@ export default function RootNavigator({
               <EditProfileScreen
                 {...props}
                 user={user}
+                palette={palette}
                 onSaveProfile={onSaveProfile}
               />
             )}

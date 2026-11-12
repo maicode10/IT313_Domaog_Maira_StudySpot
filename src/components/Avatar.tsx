@@ -7,7 +7,7 @@ type Props = {
   size?: number;
 };
 
-/** Circle with the student's initials. */
+/** Circle with the student's initials (F10). */
 export default function Avatar({ name, size = 92 }: Props) {
   const initials = name
     .trim()
@@ -18,7 +18,10 @@ export default function Avatar({ name, size = 92 }: Props) {
 
   return (
     <View
-      style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}
+      style={[
+        styles.circle,
+        { width: size, height: size, borderRadius: size / 2 },
+      ]}
     >
       <Text style={[styles.text, { fontSize: size * 0.34 }]}>{initials || "S"}</Text>
     </View>

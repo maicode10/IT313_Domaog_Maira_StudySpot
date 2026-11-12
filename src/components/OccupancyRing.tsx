@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, font } from "../theme/theme";
+import { font, Palette } from "../theme/theme";
 import { occupancyColor } from "../utils/occupancy";
 
 type Props = {
   percent: number;
+  palette: Palette;
   size?: number;
   stroke?: number;
   /** colour showing through the middle of the ring */
@@ -21,15 +22,19 @@ type Props = {
  */
 export default function OccupancyRing({
   percent,
+  palette,
   size = 54,
   stroke = 6,
-  holeColor = colors.surface,
+  holeColor,
 }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   const safe = Math.min(Math.max(Math.round(percent), 0), 100);
   const color = occupancyColor(safe);
+  const hole = holeColor ?? palette.surface;
 
   const half = size / 2;
-  const hole = size - stroke * 2;
+  const holeSize = size - stroke * 2;
 
   // 50% of the ring is 180 degrees, so one percent is 3.6 degrees.
   const firstSweep = Math.min(safe, 50) * 3.6;
@@ -40,7 +45,7 @@ export default function OccupancyRing({
     <View
       style={[
         styles.ring,
-        { width: size, height: size, borderRadius: half, backgroundColor: colors.violetSoft },
+        { width: size, height: size, borderRadius: half },
       ]}
     >
       {/* right half: holds the first 50% */}
@@ -100,10 +105,10 @@ export default function OccupancyRing({
           {
             top: stroke,
             left: stroke,
-            width: hole,
-            height: hole,
-            borderRadius: hole / 2,
-            backgroundColor: holeColor,
+            width: holeSize,
+            height: holeSize,
+            borderRadius: holeSize / 2,
+            backgroundColor: hole,
           },
         ]}
       >
@@ -114,28 +119,30 @@ export default function OccupancyRing({
   );
 }
 
-const styles = StyleSheet.create({
-  ring: {
-    overflow: "hidden",
-  },
-  clip: {
-    position: "absolute",
-    top: 0,
-    overflow: "hidden",
-  },
-  hole: {
-    position: "absolute",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  value: {
-    fontWeight: "800",
-    letterSpacing: -0.4,
-  },
-  unit: {
-    fontSize: font.tiny,
-    fontWeight: "700",
-    marginTop: 2,
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    ring: {
+      overflow: "hidden",
+      backgroundColor: p.accentSoft,
+    },
+    clip: {
+      position: "absolute",
+      top: 0,
+      overflow: "hidden",
+    },
+    hole: {
+      position: "absolute",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    value: {
+      fontWeight: "800",
+      letterSpacing: -0.4,
+    },
+    unit: {
+      fontSize: font.tiny,
+      fontWeight: "700",
+      marginTop: 2,
+    },
+  });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,7 +14,7 @@ import Notice from "../components/Notice";
 import PrimaryButton from "../components/PrimaryButton";
 import SlotChip from "../components/SlotChip";
 import Stepper from "../components/Stepper";
-import { colors, font, radius, shadow, spacing } from "../theme/theme";
+import { colors, font, Palette, radius, shadow, spacing } from "../theme/theme";
 import { Booking, StudySpace } from "../types";
 import { findConflict, todayLabel } from "../utils/occupancy";
 import { RootStackScreenProps } from "../navigation/types";
@@ -22,6 +22,7 @@ import { RootStackScreenProps } from "../navigation/types";
 type Props = RootStackScreenProps<"Booking"> & {
   spaces: StudySpace[];
   bookings: Booking[];
+  palette: Palette;
   onConfirmBooking: (booking: Booking) => void;
 };
 
@@ -40,8 +41,11 @@ export default function BookingScreen({
   navigation,
   spaces,
   bookings,
+  palette,
   onConfirmBooking,
 }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   const { spaceId, slot: presetSlot } = route.params;
   const space = spaces.find((s) => s.id === spaceId);
 
@@ -54,7 +58,7 @@ export default function BookingScreen({
   if (!space) {
     return (
       <View style={styles.notFound}>
-        <EmptyState icon="alert-circle-outline" title="Space not found." />
+        <EmptyState palette={palette} icon="alert-circle-outline" title="Space not found." />
       </View>
     );
   }
@@ -122,6 +126,7 @@ export default function BookingScreen({
               <SlotChip
                 key={value}
                 label={value}
+                palette={palette}
                 selected={slot === value}
                 disabled={isTaken(value)}
                 onPress={() => setSlot(value)}
@@ -133,6 +138,7 @@ export default function BookingScreen({
 
           {!!conflict && (
             <Notice
+              palette={palette}
               tone="warning"
               title="That overlaps a booking you already have"
               message={`${conflict.spaceName} is reserved for ${conflict.slot} on the same day. Cancel that one first, or pick another slot.`}
@@ -142,7 +148,12 @@ export default function BookingScreen({
 
         <View style={styles.block}>
           <Text style={styles.label}>Group size</Text>
-          <Stepper value={groupSize} max={space.seats} onChange={setGroupSize} />
+          <Stepper
+            value={groupSize}
+            max={space.seats}
+            palette={palette}
+            onChange={setGroupSize}
+          />
         </View>
 
         <View style={styles.block}>
@@ -153,7 +164,7 @@ export default function BookingScreen({
             value={purpose}
             onChangeText={setPurpose}
             placeholder="e.g. Reviewing for the Networking 2 quiz"
-            placeholderTextColor={colors.textFaint}
+            placeholderTextColor={palette.textFaint}
             multiline
             numberOfLines={3}
             textAlignVertical="top"
@@ -168,6 +179,7 @@ export default function BookingScreen({
       <View style={styles.footer}>
         <PrimaryButton
           label="Confirm Booking"
+          palette={palette}
           onPress={handleConfirm}
           disabled={!!conflict || (touched && !isValid)}
         />
@@ -176,80 +188,81 @@ export default function BookingScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: colors.bg },
-  notFound: { flex: 1, backgroundColor: colors.bg, justifyContent: "center" },
-  scroll: {
-    padding: spacing.xl,
-    paddingBottom: spacing.xl,
-    gap: spacing.xl,
-  },
-  summary: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xxl,
-    padding: spacing.xl,
-    gap: spacing.xs,
-    ...shadow.card,
-  },
-  summaryLabel: {
-    fontSize: font.tiny,
-    fontWeight: "800",
-    letterSpacing: 1.1,
-    textTransform: "uppercase",
-    color: colors.textFaint,
-  },
-  summaryName: {
-    fontSize: font.h1,
-    fontWeight: "800",
-    color: colors.navy,
-    letterSpacing: -0.3,
-  },
-  summaryMeta: {
-    fontSize: font.small,
-    color: colors.textMuted,
-  },
-  block: { gap: spacing.md },
-  label: {
-    fontSize: font.tiny,
-    fontWeight: "800",
-    letterSpacing: 1.1,
-    textTransform: "uppercase",
-    color: colors.textFaint,
-  },
-  slotRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  textArea: {
-    minHeight: 96,
-    borderRadius: radius.lg,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    padding: spacing.lg,
-    fontSize: font.body,
-    color: colors.text,
-    lineHeight: 21,
-  },
-  inputError: {
-    borderColor: colors.red,
-    backgroundColor: colors.redSoft,
-  },
-  error: {
-    fontSize: font.small,
-    color: colors.red,
-    fontWeight: "600",
-  },
-  counter: {
-    fontSize: font.tiny,
-    color: colors.textFaint,
-  },
-  footer: {
-    padding: spacing.xl,
-    paddingTop: spacing.md,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    flex: { flex: 1, backgroundColor: p.bg },
+    notFound: { flex: 1, backgroundColor: p.bg, justifyContent: "center" },
+    scroll: {
+      padding: spacing.xl,
+      paddingBottom: spacing.xl,
+      gap: spacing.xl,
+    },
+    summary: {
+      backgroundColor: p.surface,
+      borderRadius: radius.xxl,
+      padding: spacing.xl,
+      gap: spacing.xs,
+      ...shadow.card,
+    },
+    summaryLabel: {
+      fontSize: font.tiny,
+      fontWeight: "800",
+      letterSpacing: 1.1,
+      textTransform: "uppercase",
+      color: p.textFaint,
+    },
+    summaryName: {
+      fontSize: font.h1,
+      fontWeight: "800",
+      color: p.isDark ? p.text : colors.navy,
+      letterSpacing: -0.3,
+    },
+    summaryMeta: {
+      fontSize: font.small,
+      color: p.textMuted,
+    },
+    block: { gap: spacing.md },
+    label: {
+      fontSize: font.tiny,
+      fontWeight: "800",
+      letterSpacing: 1.1,
+      textTransform: "uppercase",
+      color: p.textFaint,
+    },
+    slotRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    textArea: {
+      minHeight: 96,
+      borderRadius: radius.lg,
+      borderWidth: 1.5,
+      borderColor: p.border,
+      backgroundColor: p.surface,
+      padding: spacing.lg,
+      fontSize: font.body,
+      color: p.text,
+      lineHeight: 21,
+    },
+    inputError: {
+      borderColor: colors.red,
+      backgroundColor: p.badSoft,
+    },
+    error: {
+      fontSize: font.small,
+      color: colors.red,
+      fontWeight: "600",
+    },
+    counter: {
+      fontSize: font.tiny,
+      color: p.textFaint,
+    },
+    footer: {
+      padding: spacing.xl,
+      paddingTop: spacing.md,
+      backgroundColor: p.surface,
+      borderTopWidth: 1,
+      borderTopColor: p.border,
+    },
+  });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -11,12 +11,13 @@ import {
 
 import Avatar from "../components/Avatar";
 import PrimaryButton from "../components/PrimaryButton";
-import { colors, font, radius, shadow, spacing } from "../theme/theme";
+import { colors, font, Palette, radius, shadow, spacing } from "../theme/theme";
 import { User } from "../types";
 import { RootStackScreenProps } from "../navigation/types";
 
 type Props = RootStackScreenProps<"EditProfile"> & {
   user: User;
+  palette: Palette;
   onSaveProfile: (name: string, section: string) => void;
 };
 
@@ -25,7 +26,14 @@ type Props = RootStackScreenProps<"EditProfile"> & {
  * Same controlled-input and inline-error rules as Login: the name cannot
  * be emptied, and Save stays blocked until it is valid.
  */
-export default function EditProfileScreen({ navigation, user, onSaveProfile }: Props) {
+export default function EditProfileScreen({
+  navigation,
+  user,
+  palette,
+  onSaveProfile,
+}: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   const [name, setName] = useState(user.name);
   const [section, setSection] = useState(user.section);
   const [error, setError] = useState<string | null>(null);
@@ -62,9 +70,7 @@ export default function EditProfileScreen({ navigation, user, onSaveProfile }: P
       >
         <View style={styles.preview}>
           <Avatar name={trimmedName || "S"} size={72} />
-          <Text style={styles.previewNote}>
-            Your initials update as you type.
-          </Text>
+          <Text style={styles.previewNote}>Your initials update as you type.</Text>
         </View>
 
         <View style={styles.card}>
@@ -75,7 +81,7 @@ export default function EditProfileScreen({ navigation, user, onSaveProfile }: P
               value={name}
               onChangeText={handleNameChange}
               placeholder="Enter your name"
-              placeholderTextColor={colors.textFaint}
+              placeholderTextColor={palette.textFaint}
               autoCapitalize="words"
               returnKeyType="next"
             />
@@ -89,7 +95,7 @@ export default function EditProfileScreen({ navigation, user, onSaveProfile }: P
               value={section}
               onChangeText={setSection}
               placeholder="e.g. IT3R4"
-              placeholderTextColor={colors.textFaint}
+              placeholderTextColor={palette.textFaint}
               autoCapitalize="characters"
               returnKeyType="done"
               onSubmitEditing={handleSave}
@@ -102,6 +108,7 @@ export default function EditProfileScreen({ navigation, user, onSaveProfile }: P
         <PrimaryButton
           label="Save Changes"
           onPress={handleSave}
+          palette={palette}
           disabled={!isValid || !isDirty}
         />
       </View>
@@ -109,61 +116,62 @@ export default function EditProfileScreen({ navigation, user, onSaveProfile }: P
   );
 }
 
-const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: colors.bg },
-  scroll: {
-    padding: spacing.xl,
-    paddingBottom: spacing.xl,
-    gap: spacing.xl,
-  },
-  preview: {
-    alignItems: "center",
-    gap: spacing.md,
-    paddingTop: spacing.md,
-  },
-  previewNote: {
-    fontSize: font.small,
-    color: colors.textMuted,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xxl,
-    padding: spacing.xl,
-    gap: spacing.xl,
-    ...shadow.card,
-  },
-  field: { gap: spacing.sm },
-  label: {
-    fontSize: font.tiny,
-    fontWeight: "800",
-    letterSpacing: 1.1,
-    textTransform: "uppercase",
-    color: colors.textFaint,
-  },
-  input: {
-    height: 52,
-    borderRadius: radius.lg,
-    backgroundColor: colors.violetTint,
-    borderWidth: 1.5,
-    borderColor: "transparent",
-    paddingHorizontal: spacing.lg,
-    fontSize: font.body,
-    color: colors.text,
-  },
-  inputError: {
-    borderColor: colors.red,
-    backgroundColor: colors.redSoft,
-  },
-  errorText: {
-    fontSize: font.small,
-    color: colors.red,
-    fontWeight: "600",
-  },
-  footer: {
-    padding: spacing.xl,
-    paddingTop: spacing.md,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    flex: { flex: 1, backgroundColor: p.bg },
+    scroll: {
+      padding: spacing.xl,
+      paddingBottom: spacing.xl,
+      gap: spacing.xl,
+    },
+    preview: {
+      alignItems: "center",
+      gap: spacing.md,
+      paddingTop: spacing.md,
+    },
+    previewNote: {
+      fontSize: font.small,
+      color: p.textMuted,
+    },
+    card: {
+      backgroundColor: p.surface,
+      borderRadius: radius.xxl,
+      padding: spacing.xl,
+      gap: spacing.xl,
+      ...shadow.card,
+    },
+    field: { gap: spacing.sm },
+    label: {
+      fontSize: font.tiny,
+      fontWeight: "800",
+      letterSpacing: 1.1,
+      textTransform: "uppercase",
+      color: p.textFaint,
+    },
+    input: {
+      height: 52,
+      borderRadius: radius.lg,
+      backgroundColor: p.field,
+      borderWidth: 1.5,
+      borderColor: "transparent",
+      paddingHorizontal: spacing.lg,
+      fontSize: font.body,
+      color: p.text,
+    },
+    inputError: {
+      borderColor: colors.red,
+      backgroundColor: p.badSoft,
+    },
+    errorText: {
+      fontSize: font.small,
+      color: colors.red,
+      fontWeight: "600",
+    },
+    footer: {
+      padding: spacing.xl,
+      paddingTop: spacing.md,
+      backgroundColor: p.surface,
+      borderTopWidth: 1,
+      borderTopColor: p.border,
+    },
+  });

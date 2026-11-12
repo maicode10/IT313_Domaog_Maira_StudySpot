@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -12,10 +12,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import HeroGlow from "../components/HeroGlow";
 import PrimaryButton from "../components/PrimaryButton";
-import { colors, font, radius, shadow, spacing } from "../theme/theme";
+import { colors, font, Palette, radius, shadow, spacing } from "../theme/theme";
 import { RootStackScreenProps } from "../navigation/types";
 
 type Props = RootStackScreenProps<"Login"> & {
+  palette: Palette;
   onSignIn: (name: string, section: string) => void;
 };
 
@@ -24,7 +25,9 @@ type Props = RootStackScreenProps<"Login"> & {
  * Controlled TextInputs. An empty name shows an inline error and blocks
  * sign-in. The header is hidden here (set in RootNavigator).
  */
-export default function LoginScreen({ onSignIn }: Props) {
+export default function LoginScreen({ palette, onSignIn }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   const [name, setName] = useState("");
   const [section, setSection] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +76,7 @@ export default function LoginScreen({ onSignIn }: Props) {
                   value={name}
                   onChangeText={handleNameChange}
                   placeholder="Enter your name"
-                  placeholderTextColor={colors.textFaint}
+                  placeholderTextColor={palette.textFaint}
                   autoCapitalize="words"
                   returnKeyType="next"
                 />
@@ -87,14 +90,19 @@ export default function LoginScreen({ onSignIn }: Props) {
                   value={section}
                   onChangeText={setSection}
                   placeholder="e.g. IT3R4"
-                  placeholderTextColor={colors.textFaint}
+                  placeholderTextColor={palette.textFaint}
                   autoCapitalize="characters"
                   returnKeyType="done"
                   onSubmitEditing={handleSignIn}
                 />
               </View>
 
-              <PrimaryButton label="Log In" onPress={handleSignIn} style={styles.button} />
+              <PrimaryButton
+                label="Log In"
+                onPress={handleSignIn}
+                palette={palette}
+                style={styles.button}
+              />
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -103,69 +111,70 @@ export default function LoginScreen({ onSignIn }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.navy, overflow: "hidden" },
-  flex: { flex: 1 },
-  scroll: {
-    flexGrow: 1,
-    justifyContent: "center",
-    padding: spacing.xl,
-    gap: spacing.xxl,
-  },
-  brand: {
-    gap: spacing.xs,
-  },
-  eyebrow: {
-    fontSize: font.tiny,
-    fontWeight: "800",
-    letterSpacing: 2,
-    color: colors.onNavyFaint,
-  },
-  appName: {
-    fontSize: 42,
-    fontWeight: "800",
-    color: colors.onNavy,
-    letterSpacing: -1.2,
-  },
-  tagline: {
-    fontSize: font.body,
-    color: colors.onNavyMuted,
-    lineHeight: 21,
-    maxWidth: 260,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 30,
-    padding: spacing.xl,
-    gap: spacing.xl,
-    ...shadow.raised,
-  },
-  field: { gap: spacing.sm },
-  label: {
-    fontSize: font.tiny,
-    fontWeight: "800",
-    letterSpacing: 1.1,
-    textTransform: "uppercase",
-    color: colors.textFaint,
-  },
-  input: {
-    height: 52,
-    borderRadius: radius.lg,
-    backgroundColor: colors.violetTint,
-    borderWidth: 1.5,
-    borderColor: "transparent",
-    paddingHorizontal: spacing.lg,
-    fontSize: font.body,
-    color: colors.text,
-  },
-  inputError: {
-    borderColor: colors.red,
-    backgroundColor: colors.redSoft,
-  },
-  errorText: {
-    fontSize: font.small,
-    color: colors.red,
-    fontWeight: "600",
-  },
-  button: { marginTop: spacing.xs },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    root: { flex: 1, backgroundColor: colors.navy, overflow: "hidden" },
+    flex: { flex: 1 },
+    scroll: {
+      flexGrow: 1,
+      justifyContent: "center",
+      padding: spacing.xl,
+      gap: spacing.xxl,
+    },
+    brand: {
+      gap: spacing.xs,
+    },
+    eyebrow: {
+      fontSize: font.tiny,
+      fontWeight: "800",
+      letterSpacing: 2,
+      color: colors.onNavyFaint,
+    },
+    appName: {
+      fontSize: 42,
+      fontWeight: "800",
+      color: colors.onNavy,
+      letterSpacing: -1.2,
+    },
+    tagline: {
+      fontSize: font.body,
+      color: colors.onNavyMuted,
+      lineHeight: 21,
+      maxWidth: 260,
+    },
+    card: {
+      backgroundColor: p.surface,
+      borderRadius: 30,
+      padding: spacing.xl,
+      gap: spacing.xl,
+      ...shadow.raised,
+    },
+    field: { gap: spacing.sm },
+    label: {
+      fontSize: font.tiny,
+      fontWeight: "800",
+      letterSpacing: 1.1,
+      textTransform: "uppercase",
+      color: p.textFaint,
+    },
+    input: {
+      height: 52,
+      borderRadius: radius.lg,
+      backgroundColor: p.field,
+      borderWidth: 1.5,
+      borderColor: "transparent",
+      paddingHorizontal: spacing.lg,
+      fontSize: font.body,
+      color: p.text,
+    },
+    inputError: {
+      borderColor: colors.red,
+      backgroundColor: p.badSoft,
+    },
+    errorText: {
+      fontSize: font.small,
+      color: colors.red,
+      fontWeight: "600",
+    },
+    button: { marginTop: spacing.xs },
+  });

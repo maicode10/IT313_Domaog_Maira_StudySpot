@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, font, radius, shadow, spacing } from "../theme/theme";
+import { colors, font, Palette, radius, shadow, spacing } from "../theme/theme";
 import { StudySpace } from "../types";
 import { occupancyPercent, seatsLeft } from "../utils/occupancy";
 import DayStrip from "./DayStrip";
@@ -10,6 +10,7 @@ import OccupancyBar from "./OccupancyBar";
 type Props = {
   space: StudySpace;
   isFavorite: boolean;
+  palette: Palette;
   onPress: () => void;
   onToggleFavorite: () => void;
   /** tapping an open block on the day strip books that slot directly */
@@ -21,11 +22,13 @@ type Props = {
 export default function SpaceCard({
   space,
   isFavorite,
+  palette,
   onPress,
   onToggleFavorite,
   onPressSlot,
   onLongPress,
 }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
   const percent = occupancyPercent(space);
 
   return (
@@ -55,63 +58,64 @@ export default function SpaceCard({
           <Ionicons
             name={isFavorite ? "heart" : "heart-outline"}
             size={19}
-            color={isFavorite ? colors.heart : colors.textFaint}
+            color={isFavorite ? colors.heart : palette.textFaint}
           />
         </Pressable>
       </View>
 
-      <OccupancyBar percent={percent} />
+      <OccupancyBar percent={percent} palette={palette} />
 
       <Text style={styles.footnote}>
         {seatsLeft(space)} of {space.seats} seats free
       </Text>
 
-      <DayStrip space={space} onPressSlot={onPressSlot} />
+      <DayStrip space={space} palette={palette} onPressSlot={onPressSlot} />
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xxl,
-    padding: spacing.lg,
-    gap: spacing.md,
-    ...shadow.card,
-  },
-  cardPressed: {
-    backgroundColor: colors.violetTint,
-  },
-  topRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
-  titleBlock: {
-    flex: 1,
-    gap: 3,
-  },
-  name: {
-    fontSize: font.h3,
-    fontWeight: "700",
-    color: colors.text,
-  },
-  meta: {
-    fontSize: font.small,
-    color: colors.textMuted,
-  },
-  heartBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.violetTint,
-  },
-  footnote: {
-    fontSize: font.tiny,
-    color: colors.textFaint,
-    fontWeight: "600",
-    marginTop: -4,
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: p.surface,
+      borderRadius: radius.xxl,
+      padding: spacing.lg,
+      gap: spacing.md,
+      ...shadow.card,
+    },
+    cardPressed: {
+      backgroundColor: p.accentTint,
+    },
+    topRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.sm,
+    },
+    titleBlock: {
+      flex: 1,
+      gap: 3,
+    },
+    name: {
+      fontSize: font.h3,
+      fontWeight: "700",
+      color: p.text,
+    },
+    meta: {
+      fontSize: font.small,
+      color: p.textMuted,
+    },
+    heartBtn: {
+      width: 34,
+      height: 34,
+      borderRadius: radius.pill,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: p.accentTint,
+    },
+    footnote: {
+      fontSize: font.tiny,
+      color: p.textFaint,
+      fontWeight: "600",
+      marginTop: -4,
+    },
+  });

@@ -1,29 +1,22 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 
 import RootNavigator from "./src/navigation/RootNavigator";
 import { spaces as initialSpaces } from "./src/data/spaces";
-import { colors } from "./src/theme/theme";
+import { colors, darkPalette, lightPalette } from "./src/theme/theme";
 import { Booking, StudySpace, User } from "./src/types";
+import { nudgeOccupancy } from "./src/utils/occupancy";
 
 // ---------------------------------------------------------------------------
 // F12 - Shared state lives here, in App, and is passed down as props.
 // No Context, no Redux. Screens never import the data file directly.
+//
+// Dark mode works the same way: App owns the `darkMode` flag, picks the
+// matching palette, and hands that palette down. Every component builds its
+// StyleSheet from the palette it is given.
 // ---------------------------------------------------------------------------
-
-const navTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: colors.navy,
-    card: colors.navy,
-    text: colors.white,
-    border: "transparent",
-    primary: colors.violet,
-  },
-};
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -31,6 +24,42 @@ export default function App() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [remindersOn, setRemindersOn] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+  const [liveOccupancy, setLiveOccupancy] = useState(true);
+
+  // Enhancement - simulated live occupancy.
+  // While the app is open the seat counts drift, so the bars, the colours
+  // and the Best Match banner all move on their own. The interval is torn
+  // down when the effect re-runs or App unmounts, so no timer leaks.
+  useEffect(() => {
+    if (!liveOccupancy) return;
+
+    const timer = setInterval(() => {
+      setSpaces((current) => current.map((space) => nudgeOccupancy(space)));
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [liveOccupancy]);
+
+  const palette = darkMode ? darkPalette : lightPalette;
+
+  // the navigation container needs its own theme so screen transitions
+  // do not flash the wrong background
+  const navTheme = useMemo(
+    () => ({
+      ...DefaultTheme,
+      dark: darkMode,
+      colors: {
+        ...DefaultTheme.colors,
+        background: colors.navy,
+        card: colors.navy,
+        text: colors.white,
+        border: "transparent",
+        primary: colors.violet,
+      },
+    }),
+    [darkMode]
+  );
 
   const handleSignIn = useCallback((name: string, section: string) => {
     setUser({ name, section });
@@ -99,14 +128,19 @@ export default function App() {
           spaces={spaces}
           bookings={bookings}
           favorites={favorites}
+          palette={palette}
+          remindersOn={remindersOn}
+          darkMode={darkMode}
+          liveOccupancy={liveOccupancy}
           onSignIn={handleSignIn}
           onSignOut={handleSignOut}
           onSaveProfile={handleSaveProfile}
           onToggleFavorite={handleToggleFavorite}
           onConfirmBooking={handleConfirmBooking}
           onCancelBooking={handleCancelBooking}
-          remindersOn={remindersOn}
           onToggleReminders={setRemindersOn}
+          onToggleDarkMode={setDarkMode}
+          onToggleLiveOccupancy={setLiveOccupancy}
         />
       </NavigationContainer>
     </SafeAreaProvider>

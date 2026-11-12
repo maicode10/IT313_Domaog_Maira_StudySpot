@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
-import { colors, font, radius, spacing } from "../theme/theme";
+import { colors, font, Palette, radius, spacing } from "../theme/theme";
 
 type Props = {
   label: string;
+  palette: Palette;
   selected?: boolean;
   disabled?: boolean;
   onPress?: () => void;
@@ -12,10 +13,13 @@ type Props = {
 /** One time slot. Struck through and not pressable when already booked. */
 export default function SlotChip({
   label,
+  palette,
   selected = false,
   disabled = false,
   onPress,
 }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   return (
     <Pressable
       onPress={onPress}
@@ -36,34 +40,35 @@ export default function SlotChip({
   );
 }
 
-const styles = StyleSheet.create({
-  chip: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: 10,
-    borderRadius: radius.md,
-    backgroundColor: colors.violetTint,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  selected: {
-    backgroundColor: colors.violetSoft,
-    borderColor: colors.violet,
-  },
-  disabled: {
-    backgroundColor: colors.disabled,
-    borderColor: colors.disabled,
-  },
-  text: {
-    fontSize: font.small,
-    fontWeight: "600",
-    color: colors.text,
-  },
-  textSelected: {
-    color: colors.violetDark,
-    fontWeight: "700",
-  },
-  textDisabled: {
-    color: colors.textFaint,
-    textDecorationLine: "line-through",
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    chip: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 10,
+      borderRadius: radius.md,
+      backgroundColor: p.accentTint,
+      borderWidth: 1.5,
+      borderColor: p.border,
+    },
+    selected: {
+      backgroundColor: p.accentSoft,
+      borderColor: colors.violet,
+    },
+    disabled: {
+      backgroundColor: p.disabled,
+      borderColor: p.disabled,
+    },
+    text: {
+      fontSize: font.small,
+      fontWeight: "600",
+      color: p.text,
+    },
+    textSelected: {
+      color: p.accentText,
+      fontWeight: "700",
+    },
+    textDisabled: {
+      color: p.textFaint,
+      textDecorationLine: "line-through",
+    },
+  });

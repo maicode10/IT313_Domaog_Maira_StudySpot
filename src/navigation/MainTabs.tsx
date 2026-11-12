@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Platform } from "react-native";
 
-import { colors, font } from "../theme/theme";
+import { colors, font, Palette } from "../theme/theme";
 import { Booking, StudySpace, User } from "../types";
 import { TabParamList } from "./types";
 
@@ -18,37 +18,48 @@ type Props = {
   spaces: StudySpace[];
   bookings: Booking[];
   favorites: string[];
+  palette: Palette;
+  remindersOn: boolean;
+  darkMode: boolean;
+  liveOccupancy: boolean;
   onToggleFavorite: (spaceId: string) => void;
   onCancelBooking: (bookingId: string) => void;
-  onSignOut: () => void;
-  remindersOn: boolean;
   onToggleReminders: (value: boolean) => void;
+  onToggleDarkMode: (value: boolean) => void;
+  onToggleLiveOccupancy: (value: boolean) => void;
+  onSignOut: () => void;
 };
 
 /**
  * F3 - Bottom tabs: Explore, Bookings, Profile.
- * Navy active colour, and a badge on Bookings that hides at zero.
+ * Navy active colour in the light theme, and a badge on Bookings that
+ * hides at zero.
  */
 export default function MainTabs({
   user,
   spaces,
   bookings,
   favorites,
+  palette,
+  remindersOn,
+  darkMode,
+  liveOccupancy,
   onToggleFavorite,
   onCancelBooking,
-  onSignOut,
-  remindersOn,
   onToggleReminders,
+  onToggleDarkMode,
+  onToggleLiveOccupancy,
+  onSignOut,
 }: Props) {
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.navy,
-        tabBarInactiveTintColor: colors.textFaint,
+        tabBarActiveTintColor: palette.tabActive,
+        tabBarInactiveTintColor: palette.textFaint,
         tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
+          backgroundColor: palette.surface,
+          borderTopColor: palette.border,
           borderTopWidth: 1,
           height: Platform.OS === "ios" ? 86 : 66,
           paddingTop: 8,
@@ -79,6 +90,7 @@ export default function MainTabs({
             {...props}
             spaces={spaces}
             favorites={favorites}
+            palette={palette}
             onToggleFavorite={onToggleFavorite}
           />
         )}
@@ -98,6 +110,7 @@ export default function MainTabs({
           <MyBookingsScreen
             {...props}
             bookings={bookings}
+            palette={palette}
             onCancelBooking={onCancelBooking}
           />
         )}
@@ -115,10 +128,15 @@ export default function MainTabs({
           <ProfileScreen
             {...props}
             user={user}
+            palette={palette}
             bookingCount={bookings.length}
             favoriteCount={favorites.length}
             remindersOn={remindersOn}
+            darkMode={darkMode}
+            liveOccupancy={liveOccupancy}
             onToggleReminders={onToggleReminders}
+            onToggleDarkMode={onToggleDarkMode}
+            onToggleLiveOccupancy={onToggleLiveOccupancy}
             onSignOut={onSignOut}
           />
         )}

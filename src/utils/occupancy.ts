@@ -12,6 +12,7 @@ export function occupancyLevel(percent: number): OccupancyLevel {
   return "high";
 }
 
+/** green below 50%, amber 50-80%, red above 80% - same in both themes */
 export function occupancyColor(percent: number): string {
   const level = occupancyLevel(percent);
   if (level === "low") return colors.green;
@@ -66,7 +67,7 @@ export type SlotRange = { start: number; end: number };
 
 /** "1:00-2:00" becomes { start: 780, end: 840 } */
 export function parseSlot(slot: string): SlotRange {
-  const [from, to] = slot.split(/[-\u2013\u2014]/);
+  const [from, to] = slot.split(/[-–—]/);
   return { start: toMinutes(from), end: toMinutes(to) };
 }
 
@@ -80,7 +81,6 @@ export function slotsOverlap(a: string, b: string): boolean {
 /**
  * Looks through every booking the student already has on this date, across
  * ALL spaces, and returns the first one that clashes with the chosen slot.
- * Returns null when the slot is free.
  */
 export function findConflict(
   bookings: Booking[],
@@ -103,21 +103,28 @@ export function todayLabel(): string {
   });
 }
 
-/**
- * The first slot of the day nobody has taken yet, or null when the space is
- * fully booked. Slots are stored in chronological order, so the first free
- * one is the next free one.
- */
+/** The first slot of the day nobody has taken yet, or null when full. */
 export function nextFreeSlot(space: StudySpace): string | null {
   return space.slots.find((slot) => !space.bookedSlots.includes(slot)) ?? null;
 }
 
-/** "10:00-11:00" -> "10:00", for compact labels. */
+/** "10:00-11:00" -> "10:00" */
 export function slotStart(slot: string): string {
-  return slot.split(/[-\u2013\u2014]/)[0].trim();
+  return slot.split(/[-–—]/)[0].trim();
 }
 
-/** "10:00-11:00" -> "10", for the tiny blocks on the day strip. */
+/** "10:00-11:00" -> "10" */
 export function slotStartHour(slot: string): string {
   return slotStart(slot).split(":")[0];
+}
+
+/**
+ * Simulated live occupancy.
+ * Moves `occupied` by a small random amount, never past 0 or the seat count.
+ * Returns the same object when nothing changed, so React can skip a render.
+ */
+export function nudgeOccupancy(space: StudySpace, swing = 1): StudySpace {
+  const delta = Math.round((Math.random() * 2 - 1) * swing);
+  const next = Math.min(Math.max(space.occupied + delta, 0), space.seats);
+  return next === space.occupied ? space : { ...space, occupied: next };
 }

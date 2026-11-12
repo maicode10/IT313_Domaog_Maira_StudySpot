@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -10,7 +10,7 @@ import PrimaryButton from "../components/PrimaryButton";
 import ScreenHero from "../components/ScreenHero";
 import SlotChip from "../components/SlotChip";
 import SpaceImage from "../components/SpaceImage";
-import { colors, font, radius, sheet, shadow, spacing } from "../theme/theme";
+import { colors, font, Palette, radius, sheetStyle, shadow, spacing } from "../theme/theme";
 import { StudySpace } from "../types";
 import { freeSlots, occupancyLabel, occupancyPercent, seatsLeft } from "../utils/occupancy";
 import { RootStackScreenProps } from "../navigation/types";
@@ -18,6 +18,7 @@ import { RootStackScreenProps } from "../navigation/types";
 type Props = RootStackScreenProps<"SpaceDetails"> & {
   spaces: StudySpace[];
   favorites: string[];
+  palette: Palette;
   onToggleFavorite: (spaceId: string) => void;
 };
 
@@ -31,8 +32,11 @@ export default function SpaceDetailsScreen({
   navigation,
   spaces,
   favorites,
+  palette,
   onToggleFavorite,
 }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   const { spaceId } = route.params;
   const space = spaces.find((s) => s.id === spaceId);
   const isFavorite = favorites.includes(spaceId);
@@ -61,6 +65,7 @@ export default function SpaceDetailsScreen({
     return (
       <View style={styles.notFound}>
         <EmptyState
+          palette={palette}
           icon="alert-circle-outline"
           title="Space not found."
           message="This space may have been removed. Go back and pick another one."
@@ -76,7 +81,13 @@ export default function SpaceDetailsScreen({
     <View style={styles.root}>
       <ScreenHero compact title={space.name} subtitle={`${space.building} · ${space.floor}`}>
         <View style={styles.heroStats}>
-          <OccupancyRing percent={percent} size={62} stroke={7} holeColor={colors.navy} />
+          <OccupancyRing
+            percent={percent}
+            palette={palette}
+            size={62}
+            stroke={7}
+            holeColor={colors.navy}
+          />
           <View style={styles.heroStatText}>
             <Text style={styles.heroStatValue}>{occupancyLabel(percent)} right now</Text>
             <Text style={styles.heroStatNote}>
@@ -86,20 +97,20 @@ export default function SpaceDetailsScreen({
         </View>
       </ScreenHero>
 
-      <View style={sheet}>
+      <View style={sheetStyle(palette)}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <SpaceImage uri={space.imageUrl} label={space.name} />
+          <SpaceImage uri={space.imageUrl} label={space.name} palette={palette} />
 
           <View style={styles.chipRow}>
-            <Chip label={space.type} />
+            <Chip label={space.type} palette={palette} />
             {space.amenities.map((amenity) => (
-              <Chip key={amenity} label={amenity} />
+              <Chip key={amenity} label={amenity} palette={palette} />
             ))}
           </View>
 
           <View style={styles.card}>
             <Text style={styles.cardLabel}>Live occupancy</Text>
-            <OccupancyBar percent={percent} height={9} />
+            <OccupancyBar percent={percent} palette={palette} height={9} />
             <Text style={styles.cardNote}>
               {space.occupied} of {space.seats} seats taken right now
             </Text>
@@ -108,9 +119,7 @@ export default function SpaceDetailsScreen({
           <View style={styles.card}>
             <View style={styles.cardHead}>
               <Text style={styles.cardLabel}>Available slots today</Text>
-              <Text style={styles.cardCount}>
-                {openCount} open
-              </Text>
+              <Text style={styles.cardCount}>{openCount} open</Text>
             </View>
 
             <View style={styles.slotRow}>
@@ -118,6 +127,7 @@ export default function SpaceDetailsScreen({
                 <SlotChip
                   key={slot}
                   label={slot}
+                  palette={palette}
                   disabled={space.bookedSlots.includes(slot)}
                   onPress={() =>
                     navigation.navigate("Booking", { spaceId: space.id, slot })
@@ -136,6 +146,7 @@ export default function SpaceDetailsScreen({
         <View style={styles.footer}>
           <PrimaryButton
             label="Book This Space"
+            palette={palette}
             onPress={() => navigation.navigate("Booking", { spaceId: space.id })}
           />
         </View>
@@ -144,82 +155,83 @@ export default function SpaceDetailsScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.navy },
-  notFound: {
-    flex: 1,
-    backgroundColor: colors.bg,
-    justifyContent: "center",
-  },
-  heroStats: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.lg,
-    marginTop: spacing.xl,
-  },
-  heroStatText: { flex: 1, gap: 2 },
-  heroStatValue: {
-    fontSize: font.h3,
-    fontWeight: "700",
-    color: colors.onNavy,
-  },
-  heroStatNote: {
-    fontSize: font.small,
-    color: colors.onNavyMuted,
-  },
-  scroll: {
-    padding: spacing.xl,
-    paddingBottom: spacing.xl,
-    gap: spacing.lg,
-  },
-  chipRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xxl,
-    padding: spacing.xl,
-    gap: spacing.md,
-    ...shadow.card,
-  },
-  cardHead: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  cardLabel: {
-    fontSize: font.tiny,
-    fontWeight: "800",
-    letterSpacing: 1.1,
-    textTransform: "uppercase",
-    color: colors.textFaint,
-  },
-  cardCount: {
-    fontSize: font.tiny,
-    fontWeight: "800",
-    color: colors.violetDark,
-  },
-  cardNote: {
-    fontSize: font.small,
-    color: colors.textMuted,
-  },
-  slotRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  description: {
-    fontSize: font.body,
-    lineHeight: 22,
-    color: colors.textMuted,
-  },
-  footer: {
-    padding: spacing.xl,
-    paddingTop: spacing.md,
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    root: { flex: 1, backgroundColor: colors.navy },
+    notFound: {
+      flex: 1,
+      backgroundColor: p.bg,
+      justifyContent: "center",
+    },
+    heroStats: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.lg,
+      marginTop: spacing.xl,
+    },
+    heroStatText: { flex: 1, gap: 2 },
+    heroStatValue: {
+      fontSize: font.h3,
+      fontWeight: "700",
+      color: colors.onNavy,
+    },
+    heroStatNote: {
+      fontSize: font.small,
+      color: colors.onNavyMuted,
+    },
+    scroll: {
+      padding: spacing.xl,
+      paddingBottom: spacing.xl,
+      gap: spacing.lg,
+    },
+    chipRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    card: {
+      backgroundColor: p.surface,
+      borderRadius: radius.xxl,
+      padding: spacing.xl,
+      gap: spacing.md,
+      ...shadow.card,
+    },
+    cardHead: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    cardLabel: {
+      fontSize: font.tiny,
+      fontWeight: "800",
+      letterSpacing: 1.1,
+      textTransform: "uppercase",
+      color: p.textFaint,
+    },
+    cardCount: {
+      fontSize: font.tiny,
+      fontWeight: "800",
+      color: p.accentText,
+    },
+    cardNote: {
+      fontSize: font.small,
+      color: p.textMuted,
+    },
+    slotRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    description: {
+      fontSize: font.body,
+      lineHeight: 22,
+      color: p.textMuted,
+    },
+    footer: {
+      padding: spacing.xl,
+      paddingTop: spacing.md,
+      backgroundColor: p.surface,
+      borderTopWidth: 1,
+      borderTopColor: p.border,
+    },
+  });

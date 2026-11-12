@@ -1,22 +1,23 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
-import { colors, font, radius, spacing } from "../theme/theme";
+import { colors, font, Palette, radius, spacing } from "../theme/theme";
 
 type Props = {
-  uri?: string;
   label: string;
+  palette: Palette;
+  uri?: string;
   height?: number;
 };
 
 /**
  * The photo for a study space (F7).
- *
- * Shows a spinner while it loads and a violet placeholder when there is no
- * photo or the phone is offline, so the screen never looks broken on
- * mobile data.
+ * Shows a spinner while it loads and a placeholder when there is no photo
+ * or the phone is offline, so the screen never looks broken on mobile data.
  */
-export default function SpaceImage({ uri, label, height = 150 }: Props) {
+export default function SpaceImage({ label, palette, uri, height = 150 }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   const [loading, setLoading] = useState(!!uri);
   const [failed, setFailed] = useState(false);
 
@@ -54,37 +55,38 @@ export default function SpaceImage({ uri, label, height = 150 }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  frame: {
-    borderRadius: radius.xl,
-    overflow: "hidden",
-    backgroundColor: colors.violetSoft,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  photo: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  center: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.xs,
-  },
-  loader: {
-    backgroundColor: colors.violetSoft,
-  },
-  placeholderText: {
-    fontSize: font.tiny,
-    fontWeight: "700",
-    color: colors.violetDark,
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    frame: {
+      borderRadius: radius.xl,
+      overflow: "hidden",
+      backgroundColor: p.accentSoft,
+      borderWidth: 1,
+      borderColor: p.border,
+    },
+    photo: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
+    center: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.xs,
+    },
+    loader: {
+      backgroundColor: p.accentSoft,
+    },
+    placeholderText: {
+      fontSize: font.tiny,
+      fontWeight: "700",
+      color: p.accentText,
+    },
+  });

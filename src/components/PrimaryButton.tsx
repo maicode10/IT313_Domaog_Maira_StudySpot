@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle } from "react-native";
-import { colors, font, radius, shadow, spacing } from "../theme/theme";
+import { colors, font, Palette, radius, shadow, spacing } from "../theme/theme";
 
 type Props = {
   label: string;
   onPress: () => void;
+  palette: Palette;
   disabled?: boolean;
   loading?: boolean;
   variant?: "solid" | "outline" | "danger";
@@ -15,11 +16,13 @@ type Props = {
 export default function PrimaryButton({
   label,
   onPress,
+  palette,
   disabled = false,
   loading = false,
   variant = "solid",
   style,
 }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
   const off = disabled || loading;
 
   return (
@@ -27,6 +30,7 @@ export default function PrimaryButton({
       onPress={onPress}
       disabled={off}
       accessibilityRole="button"
+      accessibilityState={{ disabled: off }}
       style={({ pressed }) => [
         styles.base,
         variant === "solid" && styles.solid,
@@ -38,15 +42,15 @@ export default function PrimaryButton({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={variant === "solid" ? colors.white : colors.violetDark} />
+        <ActivityIndicator color={variant === "solid" ? colors.white : palette.accentText} />
       ) : (
         <Text
           style={[
             styles.label,
-            variant === "solid" && { color: colors.white },
-            variant === "outline" && { color: colors.navy },
-            variant === "danger" && { color: colors.red },
-            off && { color: colors.textFaint },
+            variant === "solid" && styles.labelSolid,
+            variant === "outline" && styles.labelOutline,
+            variant === "danger" && styles.labelDanger,
+            off && { color: palette.textFaint },
           ]}
         >
           {label}
@@ -56,36 +60,40 @@ export default function PrimaryButton({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    height: 52,
-    borderRadius: radius.lg,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: spacing.xl,
-  },
-  solid: {
-    backgroundColor: colors.navy,
-    ...shadow.card,
-  },
-  outline: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.borderStrong,
-  },
-  danger: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: "#F3C9C8",
-  },
-  off: {
-    backgroundColor: colors.disabled,
-    borderColor: colors.disabled,
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  label: {
-    fontSize: font.h3,
-    fontWeight: "700",
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    base: {
+      height: 52,
+      borderRadius: radius.lg,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: spacing.xl,
+    },
+    solid: {
+      backgroundColor: p.isDark ? colors.violet : colors.navy,
+      ...shadow.card,
+    },
+    outline: {
+      backgroundColor: p.surface,
+      borderWidth: 1.5,
+      borderColor: p.borderStrong,
+    },
+    danger: {
+      backgroundColor: p.surface,
+      borderWidth: 1.5,
+      borderColor: p.dangerBorder,
+    },
+    off: {
+      backgroundColor: p.disabled,
+      borderColor: p.disabled,
+      shadowOpacity: 0,
+      elevation: 0,
+    },
+    label: {
+      fontSize: font.h3,
+      fontWeight: "700",
+    },
+    labelSolid: { color: colors.white },
+    labelOutline: { color: p.isDark ? p.accentText : colors.navy },
+    labelDanger: { color: colors.red },
+  });

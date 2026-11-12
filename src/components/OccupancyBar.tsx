@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, font, spacing } from "../theme/theme";
+import { font, Palette, spacing } from "../theme/theme";
 import { occupancyColor, occupancyLabel } from "../utils/occupancy";
 
 type Props = {
   percent: number;
+  palette: Palette;
   showLabel?: boolean;
   height?: number;
 };
@@ -13,14 +14,21 @@ type Props = {
  * A thin bar that fills from left to right. The width and the colour both
  * come from the percent we were given, so nothing here is hard-coded.
  */
-export default function OccupancyBar({ percent, showLabel = true, height = 7 }: Props) {
+export default function OccupancyBar({
+  percent,
+  palette,
+  showLabel = true,
+  height = 7,
+}: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   const safe = Math.min(Math.max(percent, 0), 100);
   const barColor = occupancyColor(safe);
 
   return (
     <View style={styles.row}>
       <View style={[styles.track, { height, borderRadius: height }]}>
-        {/* width and backgroundColor change at runtime -> inline style is fine */}
+        {/* width and backgroundColor change at runtime -> inline is correct */}
         <View
           style={[
             styles.fill,
@@ -38,24 +46,25 @@ export default function OccupancyBar({ percent, showLabel = true, height = 7 }: 
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  track: {
-    flex: 1,
-    backgroundColor: colors.violetSoft,
-    overflow: "hidden",
-  },
-  fill: {
-    height: "100%",
-  },
-  label: {
-    fontSize: font.tiny,
-    fontWeight: "700",
-    minWidth: 92,
-    textAlign: "right",
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    track: {
+      flex: 1,
+      backgroundColor: p.accentSoft,
+      overflow: "hidden",
+    },
+    fill: {
+      height: "100%",
+    },
+    label: {
+      fontSize: font.tiny,
+      fontWeight: "700",
+      minWidth: 92,
+      textAlign: "right",
+    },
+  });

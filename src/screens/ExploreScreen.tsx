@@ -18,7 +18,7 @@ import ScreenHero from "../components/ScreenHero";
 import SearchBar from "../components/SearchBar";
 import SectionHeader from "../components/SectionHeader";
 import SpaceCard from "../components/SpaceCard";
-import { colors, font, sheet, spacing } from "../theme/theme";
+import { colors, font, Palette, sheetStyle, spacing } from "../theme/theme";
 import { FILTERS, FilterKey, StudySpace } from "../types";
 import { clockLabel, hasOpenSlot, occupancyPercent } from "../utils/occupancy";
 import { TabScreenProps } from "../navigation/types";
@@ -26,6 +26,7 @@ import { TabScreenProps } from "../navigation/types";
 type Props = TabScreenProps<"Explore"> & {
   spaces: StudySpace[];
   favorites: string[];
+  palette: Palette;
   onToggleFavorite: (spaceId: string) => void;
 };
 
@@ -54,8 +55,11 @@ export default function ExploreScreen({
   navigation,
   spaces,
   favorites,
+  palette,
   onToggleFavorite,
 }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FilterKey>("All");
   const [refreshing, setRefreshing] = useState(false);
@@ -121,7 +125,6 @@ export default function ExploreScreen({
 
   // 3. Best match right now - among the spaces currently visible, keep the
   //    ones with an open slot, prefer Quiet, then take the lowest occupancy.
-  //    Recomputed whenever the filtered list changes.
   const bestMatch = useMemo(() => {
     const open = visible.filter(hasOpenSlot);
     if (open.length === 0) return null;
@@ -158,7 +161,7 @@ export default function ExploreScreen({
         </ScreenHero>
       </SafeAreaView>
 
-      <View style={sheet}>
+      <View style={sheetStyle(palette)}>
         <SectionList
           sections={sections}
           keyExtractor={(row) => row.map((space) => space.id).join("+")}
@@ -184,6 +187,7 @@ export default function ExploreScreen({
 
               <BestMatchBanner
                 space={bestMatch}
+                palette={palette}
                 onPress={() => {
                   if (bestMatch) {
                     navigation.navigate("SpaceDetails", { spaceId: bestMatch.id });
@@ -193,7 +197,7 @@ export default function ExploreScreen({
             </View>
           }
           renderSectionHeader={({ section }) => (
-            <SectionHeader title={section.title} count={section.count} />
+            <SectionHeader title={section.title} count={section.count} palette={palette} />
           )}
           renderItem={({ item: row }) => (
             <View style={styles.row}>
@@ -201,6 +205,7 @@ export default function ExploreScreen({
                 <View key={space.id} style={styles.cell}>
                   <SpaceCard
                     space={space}
+                    palette={palette}
                     isFavorite={favorites.includes(space.id)}
                     onPress={() =>
                       navigation.navigate("SpaceDetails", { spaceId: space.id })
@@ -220,6 +225,7 @@ export default function ExploreScreen({
           ItemSeparatorComponent={() => <View style={{ height: spacing.md }} />}
           ListEmptyComponent={
             <EmptyState
+              palette={palette}
               icon="search-outline"
               title="No spaces match your search."
               message="Try another word, or switch back to the All filter."
@@ -236,50 +242,51 @@ export default function ExploreScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.navy },
-  navyTop: { backgroundColor: colors.navy },
-  controls: {
-    gap: spacing.md,
-    marginTop: spacing.lg,
-  },
-  chipRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  listContent: {
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxxl,
-    flexGrow: 1,
-  },
-  banner: {
-    paddingTop: spacing.xl,
-    gap: spacing.md,
-  },
-  refreshRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.sm,
-  },
-  refreshText: {
-    fontSize: font.small,
-    fontWeight: "600",
-    color: colors.violetDark,
-  },
-  row: {
-    flexDirection: "row",
-    gap: spacing.md,
-  },
-  cell: {
-    flex: 1,
-    minWidth: 0, // lets long names shrink instead of widening the card
-  },
-  refreshed: {
-    fontSize: font.tiny,
-    color: colors.textFaint,
-    textAlign: "center",
-    marginTop: spacing.xl,
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    root: { flex: 1, backgroundColor: colors.navy },
+    navyTop: { backgroundColor: colors.navy },
+    controls: {
+      gap: spacing.md,
+      marginTop: spacing.lg,
+    },
+    chipRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+    },
+    listContent: {
+      paddingHorizontal: spacing.xl,
+      paddingBottom: spacing.xxxl,
+      flexGrow: 1,
+    },
+    banner: {
+      paddingTop: spacing.xl,
+      gap: spacing.md,
+    },
+    refreshRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.sm,
+    },
+    refreshText: {
+      fontSize: font.small,
+      fontWeight: "600",
+      color: p.accentText,
+    },
+    row: {
+      flexDirection: "row",
+      gap: spacing.md,
+    },
+    cell: {
+      flex: 1,
+      minWidth: 0,
+    },
+    refreshed: {
+      fontSize: font.tiny,
+      color: p.textFaint,
+      textAlign: "center",
+      marginTop: spacing.xl,
+    },
+  });

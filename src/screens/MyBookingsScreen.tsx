@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,12 +6,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Chip from "../components/Chip";
 import EmptyState from "../components/EmptyState";
 import ScreenHero from "../components/ScreenHero";
-import { colors, font, radius, sheet, shadow, spacing } from "../theme/theme";
+import { colors, font, Palette, radius, sheetStyle, shadow, spacing } from "../theme/theme";
 import { Booking } from "../types";
 import { TabScreenProps } from "../navigation/types";
 
 type Props = TabScreenProps<"Bookings"> & {
   bookings: Booking[];
+  palette: Palette;
   onCancelBooking: (bookingId: string) => void;
 };
 
@@ -20,7 +21,9 @@ type Props = TabScreenProps<"Bookings"> & {
  * A FlatList of what the student reserved. Cancel asks first, and a long
  * press is a shortcut to the same confirmation.
  */
-export default function MyBookingsScreen({ bookings, onCancelBooking }: Props) {
+export default function MyBookingsScreen({ bookings, palette, onCancelBooking }: Props) {
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
   const confirmCancel = (booking: Booking) => {
     Alert.alert("Cancel booking?", `${booking.spaceName} · ${booking.slot}`, [
       { text: "Keep it", style: "cancel" },
@@ -41,7 +44,7 @@ export default function MyBookingsScreen({ bookings, onCancelBooking }: Props) {
         />
       </SafeAreaView>
 
-      <View style={sheet}>
+      <View style={sheetStyle(palette)}>
         <FlatList
           data={bookings}
           keyExtractor={(item) => item.id}
@@ -50,6 +53,7 @@ export default function MyBookingsScreen({ bookings, onCancelBooking }: Props) {
           ItemSeparatorComponent={() => <View style={{ height: spacing.md }} />}
           ListEmptyComponent={
             <EmptyState
+              palette={palette}
               icon="calendar-outline"
               title="No bookings yet."
               message="Find a space in Explore and reserve a slot to see it here."
@@ -76,7 +80,7 @@ export default function MyBookingsScreen({ bookings, onCancelBooking }: Props) {
                   </Text>
                 </View>
 
-                <Ionicons name="time-outline" size={18} color={colors.textFaint} />
+                <Ionicons name="time-outline" size={18} color={palette.textFaint} />
               </View>
 
               <Text style={styles.purpose} numberOfLines={2}>
@@ -86,8 +90,9 @@ export default function MyBookingsScreen({ bookings, onCancelBooking }: Props) {
               <View style={styles.cardBottom}>
                 <Chip
                   label={item.confirmed ? "Confirmed" : "Pending"}
+                  palette={palette}
                   color={item.confirmed ? colors.green : colors.amber}
-                  background={item.confirmed ? colors.greenSoft : colors.amberSoft}
+                  background={item.confirmed ? palette.okSoft : palette.warnSoft}
                 />
 
                 <Pressable
@@ -106,67 +111,68 @@ export default function MyBookingsScreen({ bookings, onCancelBooking }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.navy },
-  navyTop: { backgroundColor: colors.navy },
-  listContent: {
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.xxxl,
-    flexGrow: 1,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.xxl,
-    padding: spacing.lg,
-    gap: spacing.md,
-    ...shadow.card,
-  },
-  cardPressed: {
-    backgroundColor: colors.violetTint,
-  },
-  cardTop: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
-  cardText: { flex: 1, gap: 3 },
-  name: {
-    fontSize: font.h3,
-    fontWeight: "700",
-    color: colors.text,
-  },
-  meta: {
-    fontSize: font.small,
-    color: colors.textMuted,
-  },
-  purpose: {
-    fontSize: font.small,
-    color: colors.textFaint,
-    lineHeight: 19,
-  },
-  cardBottom: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  cancelBtn: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: 7,
-    borderRadius: radius.pill,
-    borderWidth: 1.5,
-    borderColor: "#F3C9C8",
-    backgroundColor: colors.surface,
-  },
-  cancelText: {
-    fontSize: font.small,
-    fontWeight: "700",
-    color: colors.red,
-  },
-  hint: {
-    fontSize: font.tiny,
-    color: colors.textFaint,
-    textAlign: "center",
-    marginTop: spacing.lg,
-  },
-});
+const createStyles = (p: Palette) =>
+  StyleSheet.create({
+    root: { flex: 1, backgroundColor: colors.navy },
+    navyTop: { backgroundColor: colors.navy },
+    listContent: {
+      paddingHorizontal: spacing.xl,
+      paddingTop: spacing.xl,
+      paddingBottom: spacing.xxxl,
+      flexGrow: 1,
+    },
+    card: {
+      backgroundColor: p.surface,
+      borderRadius: radius.xxl,
+      padding: spacing.lg,
+      gap: spacing.md,
+      ...shadow.card,
+    },
+    cardPressed: {
+      backgroundColor: p.accentTint,
+    },
+    cardTop: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.sm,
+    },
+    cardText: { flex: 1, gap: 3 },
+    name: {
+      fontSize: font.h3,
+      fontWeight: "700",
+      color: p.text,
+    },
+    meta: {
+      fontSize: font.small,
+      color: p.textMuted,
+    },
+    purpose: {
+      fontSize: font.small,
+      color: p.textFaint,
+      lineHeight: 19,
+    },
+    cardBottom: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    cancelBtn: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 7,
+      borderRadius: radius.pill,
+      borderWidth: 1.5,
+      borderColor: p.dangerBorder,
+      backgroundColor: p.surface,
+    },
+    cancelText: {
+      fontSize: font.small,
+      fontWeight: "700",
+      color: colors.red,
+    },
+    hint: {
+      fontSize: font.tiny,
+      color: p.textFaint,
+      textAlign: "center",
+      marginTop: spacing.lg,
+    },
+  });
