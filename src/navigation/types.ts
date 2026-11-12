@@ -12,7 +12,8 @@ export type RootStackParamList = {
   Login: undefined;
   Main: NavigatorScreenParams<TabParamList> | undefined;
   SpaceDetails: { spaceId: string };
-  Booking: { spaceId: string };
+    /** slot is optional: tapping a block on the day strip preselects it. */
+  Booking: { spaceId: string; slot?: string };
 };
 
 export type TabParamList = {

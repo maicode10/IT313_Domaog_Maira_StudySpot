@@ -102,3 +102,22 @@ export function todayLabel(): string {
     year: "numeric",
   });
 }
+
+/**
+ * The first slot of the day nobody has taken yet, or null when the space is
+ * fully booked. Slots are stored in chronological order, so the first free
+ * one is the next free one.
+ */
+export function nextFreeSlot(space: StudySpace): string | null {
+  return space.slots.find((slot) => !space.bookedSlots.includes(slot)) ?? null;
+}
+
+/** "10:00-11:00" -> "10:00", for compact labels. */
+export function slotStart(slot: string): string {
+  return slot.split(/[-\u2013\u2014]/)[0].trim();
+}
+
+/** "10:00-11:00" -> "10", for the tiny blocks on the day strip. */
+export function slotStartHour(slot: string): string {
+  return slotStart(slot).split(":")[0];
+}

@@ -197,7 +197,10 @@ export default function ExploreScreen({
                     onPress={() =>
                       navigation.navigate("SpaceDetails", { spaceId: space.id })
                     }
-                    onToggleFavorite={() => onToggleFavorite(space.id)}
+                                        onToggleFavorite={() => onToggleFavorite(space.id)}
+                    onPressSlot={(slot) =>
+                      navigation.navigate("Booking", { spaceId: space.id, slot })
+                    }
                   />
                 </View>
               ))}

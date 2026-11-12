@@ -42,10 +42,11 @@ export default function BookingScreen({
   bookings,
   onConfirmBooking,
 }: Props) {
-  const { spaceId } = route.params;
+  const { spaceId, slot: presetSlot } = route.params;
   const space = spaces.find((s) => s.id === spaceId);
 
-  const [slot, setSlot] = useState<string | null>(null);
+  // preselected when the student tapped a block on the day strip
+  const [slot, setSlot] = useState<string | null>(presetSlot ?? null);
   const [groupSize, setGroupSize] = useState(1);
   const [purpose, setPurpose] = useState("");
   const [touched, setTouched] = useState(false);

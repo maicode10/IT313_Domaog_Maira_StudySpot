@@ -118,10 +118,13 @@ export default function SpaceDetailsScreen({
 
             <View style={styles.slotRow}>
               {space.slots.map((slot) => (
-                <SlotChip
+                                <SlotChip
                   key={slot}
                   label={slot}
                   disabled={space.bookedSlots.includes(slot)}
+                  onPress={() =>
+                    navigation.navigate("Booking", { spaceId: space.id, slot })
+                  }
                 />
               ))}
             </View>
