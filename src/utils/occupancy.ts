@@ -29,3 +29,21 @@ export function occupancyLabel(percent: number): string {
 export function seatsLeft(space: StudySpace): number {
   return Math.max(space.seats - space.occupied, 0);
 }
+
+/** Slots nobody has taken yet. */
+export function freeSlots(space: StudySpace): string[] {
+  return space.slots.filter((slot) => !space.bookedSlots.includes(slot));
+}
+
+/** Used by the "Open now" filter chip (F5). */
+export function hasOpenSlot(space: StudySpace): boolean {
+  return freeSlots(space).length > 0;
+}
+
+/** Short clock for the "Last refreshed" line (F6). */
+export function clockLabel(date: Date): string {
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}

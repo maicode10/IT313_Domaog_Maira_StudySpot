@@ -31,5 +31,7 @@ export type User = {
 };
 
 export type FilterKey = "All" | "Quiet" | "Group" | "Open now";
+/** The chips shown on Explore, in display order (F5). */
+export const FILTERS: FilterKey[] = ["All", "Quiet", "Group", "Open now"];
 
 export type OccupancyLevel = "low" | "medium" | "high";
