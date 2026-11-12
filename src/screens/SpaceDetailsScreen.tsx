@@ -1,37 +1,75 @@
-import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useLayoutEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import Chip from "../components/Chip";
+import EmptyState from "../components/EmptyState";
+import OccupancyBar from "../components/OccupancyBar";
 import OccupancyRing from "../components/OccupancyRing";
 import PrimaryButton from "../components/PrimaryButton";
 import ScreenHero from "../components/ScreenHero";
+import SlotChip from "../components/SlotChip";
 import { colors, font, radius, sheet, shadow, spacing } from "../theme/theme";
 import { StudySpace } from "../types";
-import { occupancyLabel, occupancyPercent, seatsLeft } from "../utils/occupancy";
+import { freeSlots, occupancyLabel, occupancyPercent, seatsLeft } from "../utils/occupancy";
 import { RootStackScreenProps } from "../navigation/types";
 
 type Props = RootStackScreenProps<"SpaceDetails"> & {
   spaces: StudySpace[];
+  favorites: string[];
+  onToggleFavorite: (spaceId: string) => void;
 };
 
 /**
- * Space Details - milestone 1 version.
- * Proves the route param works: only spaceId travels, we look the rest up.
- * The slot grid and the favourite header button come with Module 9.
+ * F7 - Space Details.
+ * The route carries only spaceId, so the space is looked up here.
+ * The heart in the header is added with navigation.setOptions.
  */
-export default function SpaceDetailsScreen({ route, navigation, spaces }: Props) {
+export default function SpaceDetailsScreen({
+  route,
+  navigation,
+  spaces,
+  favorites,
+  onToggleFavorite,
+}: Props) {
   const { spaceId } = route.params;
   const space = spaces.find((s) => s.id === spaceId);
+  const isFavorite = favorites.includes(spaceId);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () =>
+        space ? (
+          <Pressable
+            onPress={() => onToggleFavorite(space.id)}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Ionicons
+              name={isFavorite ? "heart" : "heart-outline"}
+              size={23}
+              color={isFavorite ? colors.heart : colors.white}
+            />
+          </Pressable>
+        ) : null,
+    });
+  }, [navigation, space, isFavorite, onToggleFavorite]);
 
   if (!space) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.notFound}>Space not found.</Text>
+      <View style={styles.notFound}>
+        <EmptyState
+          icon="alert-circle-outline"
+          title="Space not found."
+          message="This space may have been removed. Go back and pick another one."
+        />
       </View>
     );
   }
 
   const percent = occupancyPercent(space);
+  const openCount = freeSlots(space).length;
 
   return (
     <View style={styles.root}>
@@ -49,6 +87,12 @@ export default function SpaceDetailsScreen({ route, navigation, spaces }: Props)
 
       <View style={sheet}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          {/* image placeholder - a real photo would go here */}
+          <View style={styles.photo}>
+            <Ionicons name="image-outline" size={30} color={colors.violetMid} />
+            <Text style={styles.photoText}>Photo coming soon</Text>
+          </View>
+
           <View style={styles.chipRow}>
             <Chip label={space.type} />
             {space.amenities.map((amenity) => (
@@ -57,17 +101,35 @@ export default function SpaceDetailsScreen({ route, navigation, spaces }: Props)
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardLabel}>About this space</Text>
-            <Text style={styles.description}>{space.description}</Text>
+            <Text style={styles.cardLabel}>Live occupancy</Text>
+            <OccupancyBar percent={percent} height={9} />
+            <Text style={styles.cardNote}>
+              {space.occupied} of {space.seats} seats taken right now
+            </Text>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardLabel}>Capacity</Text>
-            <View style={styles.statGrid}>
-              <Stat value={String(space.seats)} label="Seats" />
-              <Stat value={String(space.occupied)} label="In use" />
-              <Stat value={String(space.slots.length)} label="Slots" />
+            <View style={styles.cardHead}>
+              <Text style={styles.cardLabel}>Available slots today</Text>
+              <Text style={styles.cardCount}>
+                {openCount} open
+              </Text>
             </View>
+
+            <View style={styles.slotRow}>
+              {space.slots.map((slot) => (
+                <SlotChip
+                  key={slot}
+                  label={slot}
+                  disabled={space.bookedSlots.includes(slot)}
+                />
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>About this space</Text>
+            <Text style={styles.description}>{space.description}</Text>
           </View>
         </ScrollView>
 
@@ -82,27 +144,12 @@ export default function SpaceDetailsScreen({ route, navigation, spaces }: Props)
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <View style={styles.stat}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.navy },
-  center: {
+  notFound: {
     flex: 1,
     backgroundColor: colors.bg,
-    alignItems: "center",
     justifyContent: "center",
-  },
-  notFound: {
-    fontSize: font.h3,
-    fontWeight: "700",
-    color: colors.text,
   },
   heroStats: {
     flexDirection: "row",
@@ -125,6 +172,21 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
     gap: spacing.lg,
   },
+  photo: {
+    height: 140,
+    borderRadius: radius.xl,
+    backgroundColor: colors.violetSoft,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
+  },
+  photoText: {
+    fontSize: font.tiny,
+    fontWeight: "700",
+    color: colors.violetDark,
+  },
   chipRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -137,6 +199,11 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     ...shadow.card,
   },
+  cardHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   cardLabel: {
     fontSize: font.tiny,
     fontWeight: "800",
@@ -144,34 +211,24 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     color: colors.textFaint,
   },
+  cardCount: {
+    fontSize: font.tiny,
+    fontWeight: "800",
+    color: colors.violetDark,
+  },
+  cardNote: {
+    fontSize: font.small,
+    color: colors.textMuted,
+  },
+  slotRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+  },
   description: {
     fontSize: font.body,
     lineHeight: 22,
     color: colors.textMuted,
-  },
-  statGrid: {
-    flexDirection: "row",
-    gap: spacing.md,
-  },
-  stat: {
-    flex: 1,
-    backgroundColor: colors.violetTint,
-    borderRadius: radius.lg,
-    paddingVertical: spacing.md,
-    alignItems: "center",
-    gap: 1,
-  },
-  statValue: {
-    fontSize: font.h1,
-    fontWeight: "800",
-    color: colors.navy,
-  },
-  statLabel: {
-    fontSize: font.tiny,
-    fontWeight: "700",
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-    color: colors.textFaint,
   },
   footer: {
     padding: spacing.xl,
