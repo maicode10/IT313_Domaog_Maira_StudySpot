@@ -22,6 +22,8 @@ type Props = {
   onSignIn: (name: string, section: string) => void;
   onSignOut: () => void;
   onToggleFavorite: (spaceId: string) => void;
+  onConfirmBooking: (booking: Booking) => void;
+  onCancelBooking: (bookingId: string) => void;
   remindersOn: boolean;
   onToggleReminders: (value: boolean) => void;
 };
@@ -31,6 +33,9 @@ type Props = {
  * Signed out -> only Login is registered.
  * Signed in  -> Main (tabs) + SpaceDetails + Booking (modal).
  * We never navigate by hand between the two halves; changing `user` does it.
+ *
+ * The stack header is navy and so is the top of every screen, so the header
+ * and the hero read as one block instead of two stacked bars.
  */
 export default function RootNavigator({
   user,
@@ -40,6 +45,8 @@ export default function RootNavigator({
   onSignIn,
   onSignOut,
   onToggleFavorite,
+  onConfirmBooking,
+  onCancelBooking,
   remindersOn,
   onToggleReminders,
 }: Props) {
@@ -59,6 +66,7 @@ export default function RootNavigator({
                 bookings={bookings}
                 favorites={favorites}
                 onToggleFavorite={onToggleFavorite}
+                onCancelBooking={onCancelBooking}
                 onSignOut={onSignOut}
                 remindersOn={remindersOn}
                 onToggleReminders={onToggleReminders}
@@ -66,8 +74,8 @@ export default function RootNavigator({
             )}
           </Stack.Screen>
 
-         <Stack.Screen name="SpaceDetails" options={{ title: "" }}>
-                        {(props) => (
+          <Stack.Screen name="SpaceDetails" options={{ title: "" }}>
+            {(props) => (
               <SpaceDetailsScreen
                 {...props}
                 spaces={spaces}
@@ -89,7 +97,14 @@ export default function RootNavigator({
               ),
             })}
           >
-            {(props) => <BookingScreen {...props} spaces={spaces} />}
+            {(props) => (
+              <BookingScreen
+                {...props}
+                spaces={spaces}
+                bookings={bookings}
+                onConfirmBooking={onConfirmBooking}
+              />
+            )}
           </Stack.Screen>
         </>
       )}

@@ -1,5 +1,4 @@
 import { colors } from "../theme/theme";
-import { OccupancyLevel, StudySpace } from "../types";
 import { Booking, OccupancyLevel, StudySpace } from "../types";
 
 export function occupancyPercent(space: StudySpace): number {
