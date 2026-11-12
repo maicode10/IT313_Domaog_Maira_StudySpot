@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 
+import BestMatchBanner from "../components/BestMatchBanner";
 import EmptyState from "../components/EmptyState";
 import FilterChip from "../components/FilterChip";
 import ScreenHero from "../components/ScreenHero";
@@ -18,7 +19,7 @@ import SectionHeader from "../components/SectionHeader";
 import SpaceCard from "../components/SpaceCard";
 import { colors, font, sheet, spacing } from "../theme/theme";
 import { FILTERS, FilterKey, StudySpace } from "../types";
-import { clockLabel, hasOpenSlot } from "../utils/occupancy";
+import { clockLabel, hasOpenSlot, occupancyPercent } from "../utils/occupancy";
 import { TabScreenProps } from "../navigation/types";
 
 type Props = TabScreenProps<"Explore"> & {
@@ -117,6 +118,21 @@ export default function ExploreScreen({
     }));
   }, [visible, numColumns]);
 
+  // 3. Best match right now - among the spaces currently visible, keep the
+  //    ones with an open slot, prefer Quiet, then take the lowest occupancy.
+  //    Recomputed whenever the filtered list changes.
+  const bestMatch = useMemo(() => {
+    const open = visible.filter(hasOpenSlot);
+    if (open.length === 0) return null;
+
+    const quiet = open.filter((space) => space.type === "Quiet");
+    const candidates = quiet.length > 0 ? quiet : open;
+
+    return candidates.reduce((best, space) =>
+      occupancyPercent(space) < occupancyPercent(best) ? space : best
+    );
+  }, [visible]);
+
   return (
     <View style={styles.root}>
       <SafeAreaView edges={["top"]} style={styles.navyTop}>
@@ -155,6 +171,18 @@ export default function ExploreScreen({
               tintColor={colors.violet}
               colors={[colors.violet]}
             />
+          }
+          ListHeaderComponent={
+            <View style={styles.banner}>
+              <BestMatchBanner
+                space={bestMatch}
+                onPress={() => {
+                  if (bestMatch) {
+                    navigation.navigate("SpaceDetails", { spaceId: bestMatch.id });
+                  }
+                }}
+              />
+            </View>
           }
           renderSectionHeader={({ section }) => (
             <SectionHeader title={section.title} count={section.count} />
@@ -213,6 +241,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xxxl,
     flexGrow: 1,
+  },
+  banner: {
+    paddingTop: spacing.xl,
   },
   row: {
     flexDirection: "row",
