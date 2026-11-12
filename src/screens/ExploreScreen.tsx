@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   RefreshControl,
   SectionList,
   StyleSheet,
@@ -174,6 +175,13 @@ export default function ExploreScreen({
           }
           ListHeaderComponent={
             <View style={styles.banner}>
+              {refreshing && (
+                <View style={styles.refreshRow}>
+                  <ActivityIndicator size="small" color={colors.violet} />
+                  <Text style={styles.refreshText}>Checking seats...</Text>
+                </View>
+              )}
+
               <BestMatchBanner
                 space={bestMatch}
                 onPress={() => {
@@ -197,7 +205,7 @@ export default function ExploreScreen({
                     onPress={() =>
                       navigation.navigate("SpaceDetails", { spaceId: space.id })
                     }
-                                        onToggleFavorite={() => onToggleFavorite(space.id)}
+                    onToggleFavorite={() => onToggleFavorite(space.id)}
                     onPressSlot={(slot) =>
                       navigation.navigate("Booking", { spaceId: space.id, slot })
                     }
@@ -247,6 +255,18 @@ const styles = StyleSheet.create({
   },
   banner: {
     paddingTop: spacing.xl,
+    gap: spacing.md,
+  },
+  refreshRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+  },
+  refreshText: {
+    fontSize: font.small,
+    fontWeight: "600",
+    color: colors.violetDark,
   },
   row: {
     flexDirection: "row",

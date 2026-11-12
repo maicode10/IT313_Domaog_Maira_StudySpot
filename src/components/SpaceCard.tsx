@@ -3,9 +3,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, font, radius, shadow, spacing } from "../theme/theme";
 import { StudySpace } from "../types";
-import { occupancyColor, occupancyLabel, occupancyPercent, seatsLeft } from "../utils/occupancy";
+import { occupancyPercent, seatsLeft } from "../utils/occupancy";
 import DayStrip from "./DayStrip";
-import OccupancyRing from "./OccupancyRing";
+import OccupancyBar from "./OccupancyBar";
 
 type Props = {
   space: StudySpace;
@@ -17,7 +17,7 @@ type Props = {
   onLongPress?: () => void;
 };
 
-/** One study space in the Explore list. */
+/** One study space in the Explore list (F4). */
 export default function SpaceCard({
   space,
   isFavorite,
@@ -27,7 +27,6 @@ export default function SpaceCard({
   onLongPress,
 }: Props) {
   const percent = occupancyPercent(space);
-  const statusColor = occupancyColor(percent);
 
   return (
     <Pressable
@@ -37,25 +36,13 @@ export default function SpaceCard({
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
       <View style={styles.topRow}>
-        <OccupancyRing percent={percent} />
-
-        <View style={styles.body}>
+        <View style={styles.titleBlock}>
           <Text style={styles.name} numberOfLines={1}>
             {space.name}
           </Text>
           <Text style={styles.meta} numberOfLines={1}>
-            {space.floor} · {space.type}
+            {space.floor} · {space.type} · {space.seats} seats
           </Text>
-
-          <View style={styles.statusRow}>
-            <View style={[styles.dot, { backgroundColor: statusColor }]} />
-            <Text style={[styles.status, { color: statusColor }]}>
-              {occupancyLabel(percent)}
-            </Text>
-            <Text style={styles.seats}>
-              {seatsLeft(space)} of {space.seats} free
-            </Text>
-          </View>
         </View>
 
         <Pressable
@@ -72,6 +59,12 @@ export default function SpaceCard({
           />
         </Pressable>
       </View>
+
+      <OccupancyBar percent={percent} />
+
+      <Text style={styles.footnote}>
+        {seatsLeft(space)} of {space.seats} seats free
+      </Text>
 
       <DayStrip space={space} onPressSlot={onPressSlot} />
     </Pressable>
@@ -91,10 +84,10 @@ const styles = StyleSheet.create({
   },
   topRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.lg,
+    alignItems: "flex-start",
+    gap: spacing.sm,
   },
-  body: {
+  titleBlock: {
     flex: 1,
     gap: 3,
   },
@@ -107,28 +100,6 @@ const styles = StyleSheet.create({
     fontSize: font.small,
     color: colors.textMuted,
   },
-  statusRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-    marginTop: 4,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  status: {
-    fontSize: font.tiny,
-    fontWeight: "800",
-    letterSpacing: 0.3,
-  },
-  seats: {
-    fontSize: font.tiny,
-    color: colors.textFaint,
-    fontWeight: "600",
-    marginLeft: spacing.xs,
-  },
   heartBtn: {
     width: 34,
     height: 34,
@@ -136,5 +107,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.violetTint,
+  },
+  footnote: {
+    fontSize: font.tiny,
+    color: colors.textFaint,
+    fontWeight: "600",
+    marginTop: -4,
   },
 });
