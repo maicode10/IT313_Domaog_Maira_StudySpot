@@ -313,6 +313,13 @@ Redux or other state library is used.
 | <img src="docs/05-bookings.jpg" width="250"> | <img src="docs/06-profile.jpg" width="250"> |
 | **My Bookings (F9)** — Confirmed chip, Cancel, long-press | **Profile (F10)** — avatar, counts, three Switches, Log Out |
 
+### Wide screen (F11)
+
+At 600 points or wider the same SectionList switches to two columns. Nothing
+about the card changes — only how many fit on a row.
+
+<img src="docs/11-wide.jpg" width="700">
+
 ### Dark theme
 
 The same screens with the Dark mode Switch turned on. Only the palette
