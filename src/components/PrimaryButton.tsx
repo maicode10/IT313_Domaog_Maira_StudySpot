@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, ViewStyle } from "react-native";
 import { colors, font, Palette, radius, shadow, spacing } from "../theme/theme";
 
 type Props = {
@@ -7,7 +7,6 @@ type Props = {
   onPress: () => void;
   palette: Palette;
   disabled?: boolean;
-  loading?: boolean;
   variant?: "solid" | "outline" | "danger";
   style?: ViewStyle;
 };
@@ -18,44 +17,38 @@ export default function PrimaryButton({
   onPress,
   palette,
   disabled = false,
-  loading = false,
   variant = "solid",
   style,
 }: Props) {
   const styles = useMemo(() => createStyles(palette), [palette]);
-  const off = disabled || loading;
 
   return (
     <Pressable
       onPress={onPress}
-      disabled={off}
+      disabled={disabled}
       accessibilityRole="button"
-      accessibilityState={{ disabled: off }}
+      accessibilityState={{ disabled }}
       style={({ pressed }) => [
         styles.base,
         variant === "solid" && styles.solid,
         variant === "outline" && styles.outline,
         variant === "danger" && styles.danger,
-        off && styles.off,
-        pressed && !off && { transform: [{ scale: 0.985 }], opacity: 0.92 },
+        disabled && styles.off,
+        pressed && !disabled && { transform: [{ scale: 0.985 }], opacity: 0.92 },
         style,
       ]}
     >
-      {loading ? (
-        <ActivityIndicator color={variant === "solid" ? colors.white : palette.accentText} />
-      ) : (
-        <Text
-          style={[
-            styles.label,
-            variant === "solid" && styles.labelSolid,
-            variant === "outline" && styles.labelOutline,
-            variant === "danger" && styles.labelDanger,
-            off && { color: palette.textFaint },
-          ]}
-        >
-          {label}
-        </Text>
-      )}
+      <Text
+        style={[
+          styles.label,
+          variant === "solid" && styles.labelSolid,
+          variant === "outline" && styles.labelOutline,
+          variant === "danger" && styles.labelDanger,
+          disabled && { color: palette.textFaint },
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }

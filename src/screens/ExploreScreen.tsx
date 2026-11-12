@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   RefreshControl,
@@ -76,11 +76,21 @@ export default function ExploreScreen({
     }, [])
   );
 
-  // F6 - pull down to refresh.
+  // F6 - pull down to refresh. The timer is kept in a ref so it can be
+  // cleared if the screen unmounts mid-refresh.
+  const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (refreshTimer.current) clearTimeout(refreshTimer.current);
+    },
+    []
+  );
+
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
 
-    setTimeout(() => {
+    refreshTimer.current = setTimeout(() => {
       setLastRefreshed(new Date());
       setRefreshing(false);
     }, 700);

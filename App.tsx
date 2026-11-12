@@ -97,27 +97,27 @@ export default function App() {
     );
   }, []);
 
-  const handleCancelBooking = useCallback((bookingId: string) => {
-    setBookings((current) => {
-      const target = current.find((b) => b.id === bookingId);
+  const handleCancelBooking = useCallback(
+    (bookingId: string) => {
+      const target = bookings.find((b) => b.id === bookingId);
+      if (!target) return;
 
-      if (target) {
-        // free the slot again
-        setSpaces((all) =>
-          all.map((space) =>
-            space.id === target.spaceId
-              ? {
-                  ...space,
-                  bookedSlots: space.bookedSlots.filter((s) => s !== target.slot),
-                }
-              : space
-          )
-        );
-      }
+      setBookings((current) => current.filter((b) => b.id !== bookingId));
 
-      return current.filter((b) => b.id !== bookingId);
-    });
-  }, []);
+      // free the slot again
+      setSpaces((current) =>
+        current.map((space) =>
+          space.id === target.spaceId
+            ? {
+                ...space,
+                bookedSlots: space.bookedSlots.filter((s) => s !== target.slot),
+              }
+            : space
+        )
+      );
+    },
+    [bookings]
+  );
 
   return (
     <SafeAreaProvider>
