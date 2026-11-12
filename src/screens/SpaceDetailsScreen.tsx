@@ -99,7 +99,7 @@ export default function SpaceDetailsScreen({
 
       <View style={sheetStyle(palette)}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <SpaceImage uri={space.imageUrl} label={space.name} palette={palette} />
+          <SpaceImage source={space.imageSource} label={space.name} palette={palette} />
 
           <View style={styles.chipRow}>
             <Chip label={space.type} palette={palette} />

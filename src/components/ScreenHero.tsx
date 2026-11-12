@@ -4,8 +4,6 @@ import HeroGlow from "./HeroGlow";
 import { colors, font, spacing } from "../theme/theme";
 
 type Props = {
-  /** small all-caps line above the title */
-  eyebrow?: string;
   title: string;
   subtitle?: string;
   /** anything that should sit inside the navy block, under the title */
@@ -16,7 +14,6 @@ type Props = {
 
 /** The navy block at the top of every screen. */
 export default function ScreenHero({
-  eyebrow,
   title,
   subtitle,
   children,
@@ -25,8 +22,6 @@ export default function ScreenHero({
   return (
     <View style={[styles.hero, compact && styles.heroCompact]}>
       <HeroGlow />
-
-      {!!eyebrow && <Text style={styles.eyebrow}>{eyebrow}</Text>}
 
       <Text style={styles.title}>{title}</Text>
       {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
@@ -47,13 +42,6 @@ const styles = StyleSheet.create({
   heroCompact: {
     paddingTop: spacing.xs,
     paddingBottom: spacing.xl + spacing.lg,
-  },
-  eyebrow: {
-    fontSize: font.tiny,
-    fontWeight: "800",
-    letterSpacing: 1.8,
-    color: colors.onNavyFaint,
-    marginBottom: 6,
   },
   title: {
     fontSize: font.display,

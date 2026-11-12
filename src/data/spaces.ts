@@ -8,7 +8,7 @@ import { StudySpace } from "../types";
 export const spaces: StudySpace[] = [
   {
     id: "s1",
-    imageUrl: "https://picsum.photos/seed/studyspot-library-2a/800/400",
+    imageSource: require("../../assets/spaces/library-2a.jpg"),
     name: "Library Quiet Room 2A",
     building: "Main Library",
     floor: "2nd floor",
@@ -22,7 +22,7 @@ export const spaces: StudySpace[] = [
   },
   {
     id: "s2",
-    imageUrl: "https://picsum.photos/seed/studyspot-pod-b/800/400",
+    imageSource: require("../../assets/spaces/study-pod-b.jpg"),
     name: "Group Study Pod B",
     building: "Main Library",
     floor: "1st floor",
@@ -36,7 +36,7 @@ export const spaces: StudySpace[] = [
   },
   {
     id: "s3",
-    imageUrl: "https://picsum.photos/seed/studyspot-collab-lab/800/400",
+    imageSource: require("../../assets/spaces/ict-collab-lab.jpg"),
     name: "ICT Collab Lab",
     building: "ICT Building",
     floor: "Room 204",
@@ -50,7 +50,7 @@ export const spaces: StudySpace[] = [
   },
   {
     id: "s4",
-    imageUrl: "https://picsum.photos/seed/studyspot-hub-nook/800/400",
+    imageSource: require("../../assets/spaces/innovation-nook.jpg"),
     name: "Innovation Hub Nook",
     building: "ICT Building",
     floor: "Ground floor",

@@ -275,6 +275,7 @@ showing.
 
 ```
 App.tsx                       all shared state (F12)
+assets/spaces/                photos for the four study spaces
 src/
   types/index.ts              StudySpace, Booking, User, FilterKey
   data/spaces.ts              the starter spaces
@@ -342,5 +343,8 @@ Redux or other state library is used.
   values that are computed at runtime, such as the occupancy bar's width and
   colour or a glow layer's size.
 - Navy `#1A1751` is used for the stack headers and the active tab colour.
+- Space photos are bundled in `assets/spaces/` and loaded with `require()`, so
+  they work with no network. `SpaceImage` still shows a spinner while a photo
+  decodes and falls back to a placeholder if one is missing.
 - `Platform.select` in `theme/theme.ts` gives iOS a soft violet card shadow and
   Android an elevation instead.

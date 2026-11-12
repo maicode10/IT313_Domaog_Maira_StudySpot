@@ -15,7 +15,6 @@ type Props = {
   onToggleFavorite: () => void;
   /** tapping an open block on the day strip books that slot directly */
   onPressSlot?: (slot: string) => void;
-  onLongPress?: () => void;
 };
 
 /** One study space in the Explore list (F4). */
@@ -26,7 +25,6 @@ export default function SpaceCard({
   onPress,
   onToggleFavorite,
   onPressSlot,
-  onLongPress,
 }: Props) {
   const styles = useMemo(() => createStyles(palette), [palette]);
   const percent = occupancyPercent(space);
@@ -34,7 +32,6 @@ export default function SpaceCard({
   return (
     <Pressable
       onPress={onPress}
-      onLongPress={onLongPress}
       accessibilityRole="button"
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
