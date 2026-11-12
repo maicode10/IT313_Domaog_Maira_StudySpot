@@ -302,14 +302,28 @@ Redux or other state library is used.
 
 ## 8. Screens
 
+### Light theme
+
 | | |
 | --- | --- |
-| ![Login](docs/01-login.png) | ![Explore](docs/02-explore.png) |
-| **Login (F1)** — controlled inputs, inline error on an empty name | **Explore (F4–F6)** — sections, search, chips, Best Match, day strips |
-| ![Space Details](docs/03-details.png) | ![Booking](docs/04-booking.png) |
-| **Space Details (F7)** — photo, amenities, occupancy, slots | **Booking (F8)** — slot picker, stepper, validation, conflict warning |
-| ![My Bookings](docs/05-bookings.png) | ![Profile](docs/06-profile.png) |
-| **My Bookings (F9)** — cancel and long-press | **Profile (F10)** — avatar, counts, Switch, edit |
+| <img src="docs/01-login.jpg" width="250"> | <img src="docs/02-explore.jpg" width="250"> |
+| **Login (F1)** — controlled inputs, inline error on an empty name | **Explore (F4–F6)** — building sections, search, filter chips, Best Match banner, day strips |
+| <img src="docs/03-details.jpg" width="250"> | <img src="docs/04-booking.jpg" width="250"> |
+| **Space Details (F7)** — photo, amenity chips, live occupancy, slots | **Booking (F8)** — slot picker, stepper, purpose validation |
+| <img src="docs/05-bookings.jpg" width="250"> | <img src="docs/06-profile.jpg" width="250"> |
+| **My Bookings (F9)** — Confirmed chip, Cancel, long-press | **Profile (F10)** — avatar, counts, three Switches, Log Out |
+
+### Dark theme
+
+The same screens with the Dark mode Switch turned on. Only the palette
+changes; the navy hero and the occupancy colours stay the same.
+
+| | |
+| --- | --- |
+| <img src="docs/07-explore-dark.jpg" width="250"> | <img src="docs/08-details-dark.jpg" width="250"> |
+| **Explore** in dark | **Space Details** in dark |
+| <img src="docs/09-bookings-dark.jpg" width="250"> | <img src="docs/10-profile-dark.jpg" width="250"> |
+| **My Bookings** in dark | **Profile** in dark, Switch on |
 
 ---
 
