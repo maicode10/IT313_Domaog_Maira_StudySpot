@@ -11,6 +11,7 @@ import LoginScreen from "../screens/LoginScreen";
 import MainTabs from "./MainTabs";
 import SpaceDetailsScreen from "../screens/SpaceDetailsScreen";
 import BookingScreen from "../screens/BookingScreen";
+import EditProfileScreen from "../screens/EditProfileScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -23,6 +24,7 @@ type Props = {
   onSignOut: () => void;
   onToggleFavorite: (spaceId: string) => void;
   onConfirmBooking: (booking: Booking) => void;
+  onSaveProfile: (name: string, section: string) => void;
   onCancelBooking: (bookingId: string) => void;
   remindersOn: boolean;
   onToggleReminders: (value: boolean) => void;
@@ -31,7 +33,7 @@ type Props = {
 /**
  * F2 - Conditional navigation.
  * Signed out -> only Login is registered.
- * Signed in  -> Main (tabs) + SpaceDetails + Booking (modal).
+ * Signed in  -> Main (tabs) + SpaceDetails + Booking + EditProfile (modals).
  * We never navigate by hand between the two halves; changing `user` does it.
  *
  * The stack header is navy and so is the top of every screen, so the header
@@ -47,6 +49,7 @@ export default function RootNavigator({
   onToggleFavorite,
   onConfirmBooking,
   onCancelBooking,
+  onSaveProfile,
   remindersOn,
   onToggleReminders,
 }: Props) {
@@ -103,6 +106,27 @@ export default function RootNavigator({
                 spaces={spaces}
                 bookings={bookings}
                 onConfirmBooking={onConfirmBooking}
+              />
+            )}
+          </Stack.Screen>
+
+          <Stack.Screen
+            name="EditProfile"
+            options={({ navigation }) => ({
+              presentation: "modal",
+              title: "Edit Profile",
+              headerLeft: () => (
+                <Pressable onPress={() => navigation.goBack()} hitSlop={10}>
+                  <Ionicons name="close" size={24} color={colors.white} />
+                </Pressable>
+              ),
+            })}
+          >
+            {(props) => (
+              <EditProfileScreen
+                {...props}
+                user={user}
+                onSaveProfile={onSaveProfile}
               />
             )}
           </Stack.Screen>

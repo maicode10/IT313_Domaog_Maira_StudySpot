@@ -43,6 +43,10 @@ export default function App() {
     setSpaces(initialSpaces);
   }, []);
 
+  const handleSaveProfile = useCallback((name: string, section: string) => {
+    setUser({ name, section });
+  }, []);
+
   const handleToggleFavorite = useCallback((spaceId: string) => {
     setFavorites((current) =>
       current.includes(spaceId)
@@ -97,6 +101,7 @@ export default function App() {
           favorites={favorites}
           onSignIn={handleSignIn}
           onSignOut={handleSignOut}
+          onSaveProfile={handleSaveProfile}
           onToggleFavorite={handleToggleFavorite}
           onConfirmBooking={handleConfirmBooking}
           onCancelBooking={handleCancelBooking}

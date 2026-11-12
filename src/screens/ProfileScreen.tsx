@@ -1,6 +1,6 @@
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Avatar from "../components/Avatar";
@@ -21,6 +21,7 @@ type Props = TabScreenProps<"Profile"> & {
 
 /** Profile (F10) - avatar, counts, a Switch, and Log Out. */
 export default function ProfileScreen({
+  navigation,
   user,
   bookingCount,
   favoriteCount,
@@ -34,12 +35,23 @@ export default function ProfileScreen({
         <ScreenHero title="Profile">
           <View style={styles.identity}>
             <Avatar name={user.name} size={64} />
+
             <View style={styles.identityText}>
               <Text style={styles.name} numberOfLines={1}>
                 {user.name}
               </Text>
               <Text style={styles.section}>{user.section || "No section set"}</Text>
             </View>
+
+            <Pressable
+              onPress={() => navigation.navigate("EditProfile")}
+              accessibilityRole="button"
+              accessibilityLabel="Edit profile"
+              style={({ pressed }) => [styles.editBtn, pressed && { opacity: 0.7 }]}
+            >
+              <Ionicons name="create-outline" size={15} color={colors.onNavy} />
+              <Text style={styles.editText}>Edit</Text>
+            </Pressable>
           </View>
         </ScreenHero>
       </SafeAreaView>
@@ -104,6 +116,22 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
   },
   identityText: { flex: 1, gap: 2 },
+  editBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 7,
+    borderRadius: radius.pill,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.18)",
+  },
+  editText: {
+    fontSize: font.small,
+    fontWeight: "700",
+    color: colors.onNavy,
+  },
   name: {
     fontSize: font.h1,
     fontWeight: "800",

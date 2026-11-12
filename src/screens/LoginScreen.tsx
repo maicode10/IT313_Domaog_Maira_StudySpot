@@ -96,10 +96,6 @@ export default function LoginScreen({ onSignIn }: Props) {
 
               <PrimaryButton label="Log In" onPress={handleSignIn} style={styles.button} />
             </View>
-
-            <Text style={styles.note}>
-              Any non-empty name works. Sign-in is simulated.
-            </Text>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -172,9 +168,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   button: { marginTop: spacing.xs },
-  note: {
-    fontSize: font.tiny,
-    color: colors.onNavyFaint,
-    textAlign: "center",
-  },
 });
