@@ -1,3 +1,5 @@
+import type { ImageSourcePropType } from "react-native";
+
 export type SpaceType = "Quiet" | "Group";
 
 export type StudySpace = {
@@ -12,8 +14,8 @@ export type StudySpace = {
   description: string;
   slots: string[];
   bookedSlots: string[];
-  /** optional photo; the details screen falls back to a placeholder */
-  imageUrl?: string;
+  /** optional bundled photo; the details screen falls back to a placeholder */
+  imageSource?: ImageSourcePropType;
 };
 
 export type Booking = {

@@ -1,12 +1,19 @@
 import React, { useMemo, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ImageSourcePropType,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { colors, font, Palette, radius, spacing } from "../theme/theme";
 
 type Props = {
   label: string;
   palette: Palette;
-  uri?: string;
+  source?: ImageSourcePropType;
   height?: number;
 };
 
@@ -15,19 +22,19 @@ type Props = {
  * Shows a spinner while it loads and a placeholder when there is no photo
  * or the phone is offline, so the screen never looks broken on mobile data.
  */
-export default function SpaceImage({ label, palette, uri, height = 150 }: Props) {
+export default function SpaceImage({ label, palette, source, height = 150 }: Props) {
   const styles = useMemo(() => createStyles(palette), [palette]);
 
-  const [loading, setLoading] = useState(!!uri);
+  const [loading, setLoading] = useState(!!source);
   const [failed, setFailed] = useState(false);
 
-  const showPlaceholder = !uri || failed;
+  const showPlaceholder = !source || failed;
 
   return (
     <View style={[styles.frame, { height }]}>
       {!showPlaceholder && (
         <Image
-          source={{ uri }}
+          source={source}
           style={styles.photo}
           resizeMode="cover"
           accessibilityLabel={`Photo of ${label}`}
