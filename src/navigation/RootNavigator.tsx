@@ -67,7 +67,14 @@ export default function RootNavigator({
           </Stack.Screen>
 
          <Stack.Screen name="SpaceDetails" options={{ title: "" }}>
-            {(props) => <SpaceDetailsScreen {...props} spaces={spaces} />}
+                        {(props) => (
+              <SpaceDetailsScreen
+                {...props}
+                spaces={spaces}
+                favorites={favorites}
+                onToggleFavorite={onToggleFavorite}
+              />
+            )}
           </Stack.Screen>
 
           <Stack.Screen
